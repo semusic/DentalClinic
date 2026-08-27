@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# NetBeans private/user-specific files
+nbproject/private/
+nbbuild/private/
+nbactions.xml
+
+# Ant build output
+build/
+dist/
+
+# Compiled Java files
+*.class
+
+# Java archives generated during builds
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.log
+
+# IDE files
+.idea/
+.vscode/
+
+# Test/report generated files
+coverage/
+test-results/
+
+# Local environment/configuration
+.env
