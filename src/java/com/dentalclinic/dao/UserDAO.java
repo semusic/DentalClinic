@@ -3,6 +3,7 @@ package com.dentalclinic.dao;
 import com.dentalclinic.model.User;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.sql.Connection;
 
 public interface UserDAO {
 
@@ -15,4 +16,9 @@ public interface UserDAO {
     boolean existsByEmail(String email) throws SQLException;
 
     int save(User user) throws SQLException;
+    
+    int save(
+        User user,
+        Connection connection
+) throws SQLException;
 }

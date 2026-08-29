@@ -172,6 +172,73 @@ public class UserDAOImpl implements UserDAO {
 
         throw new SQLException("Unable to create user.");
     }
+    
+    @Override
+public int save(
+        User user,
+        Connection connection
+) throws SQLException {
+
+    try (PreparedStatement statement =
+                 connection.prepareStatement(
+                         INSERT_USER,
+                         Statement.RETURN_GENERATED_KEYS)) {
+
+        statement.setInt(
+                1,
+                user.getRoleId()
+        );
+
+        statement.setString(
+                2,
+                user.getUsername()
+        );
+
+        statement.setString(
+                3,
+                user.getEmail()
+        );
+
+        statement.setString(
+                4,
+                user.getPasswordHash()
+        );
+
+        statement.setString(
+                5,
+                user.getFirstName()
+        );
+
+        statement.setString(
+                6,
+                user.getLastName()
+        );
+
+        statement.setString(
+                7,
+                user.getPhone()
+        );
+
+        statement.setBoolean(
+                8,
+                user.isActive()
+        );
+
+        statement.executeUpdate();
+
+        try (ResultSet keys =
+                     statement.getGeneratedKeys()) {
+
+            if (keys.next()) {
+                return keys.getInt(1);
+            }
+        }
+    }
+
+    throw new SQLException(
+            "Unable to create user."
+    );
+}
 
     private User mapUser(ResultSet resultSet)
             throws SQLException {
