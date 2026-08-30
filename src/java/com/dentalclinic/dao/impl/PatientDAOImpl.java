@@ -25,6 +25,20 @@ public class PatientDAOImpl implements PatientDAO {
         )
         VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
+    
+    private static final String FIND_BY_ID = """
+    SELECT
+        patient_id,
+        user_id,
+        date_of_birth,
+        gender,
+        address,
+        emergency_contact_name,
+        emergency_contact_phone,
+        medical_notes
+    FROM patients
+    WHERE patient_id = ?
+    """;
 
     @Override
 public int save(
@@ -151,4 +165,74 @@ public int save(
                 "Unable to create patient profile."
         );
     }
+    
+    @Override
+public java.util.Optional<Patient> findById(
+        int patientId
+) throws SQLException {
+
+    try (Connection connection =
+                 DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(FIND_BY_ID)) {
+
+        statement.setInt(1, patientId);
+
+        try (ResultSet resultSet =
+                     statement.executeQuery()) {
+
+            if (resultSet.next()) {
+
+                Patient patient = new Patient();
+
+                patient.setPatientId(
+                        resultSet.getInt("patient_id")
+                );
+
+                patient.setUserId(
+                        resultSet.getInt("user_id")
+                );
+
+                java.sql.Date dateOfBirth =
+                        resultSet.getDate("date_of_birth");
+
+                if (dateOfBirth != null) {
+                    patient.setDateOfBirth(
+                            dateOfBirth.toLocalDate()
+                    );
+                }
+
+                patient.setGender(
+                        resultSet.getString("gender")
+                );
+
+                patient.setAddress(
+                        resultSet.getString("address")
+                );
+
+                patient.setEmergencyContactName(
+                        resultSet.getString(
+                                "emergency_contact_name"
+                        )
+                );
+
+                patient.setEmergencyContactPhone(
+                        resultSet.getString(
+                                "emergency_contact_phone"
+                        )
+                );
+
+                patient.setMedicalNotes(
+                        resultSet.getString(
+                                "medical_notes"
+                        )
+                );
+
+                return java.util.Optional.of(patient);
+            }
+        }
+    }
+
+    return java.util.Optional.empty();
+}
 }
