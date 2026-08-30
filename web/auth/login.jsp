@@ -159,6 +159,19 @@
 
     </form>
 
+          
+          <div style="text-align:center; margin-top:20px;">
+    <span style="color:#718096;">
+        Don't have an account?
+    </span>
+
+    <a
+        href="${pageContext.request.contextPath}/register"
+        style="color:#1677a5; font-weight:600;">
+        Create one
+    </a>
+</div>
+        
 </div>
 
 </body>
