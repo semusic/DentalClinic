@@ -38,19 +38,12 @@ public class AppointmentServiceImpl
             AppointmentRequestDTO request
     ) throws SQLException, ValidationException {
 
-        /*
-         * STEP 1
-         * Validate the appointment request using
-         * the Chain of Responsibility.
-         */
+        
         validationChain
                 .getFirstHandler()
                 .validate(request);
 
-        /*
-         * STEP 2
-         * Convert the DTO into the Appointment entity.
-         */
+        
         Appointment appointment =
                 new Appointment();
 
@@ -78,13 +71,7 @@ public class AppointmentServiceImpl
                 request.getPatientReason()
         );
 
-        /*
-         * STEP 3
-         * Retrieve PENDING status from the database.
-         *
-         * We do NOT hard-code:
-         * statusId = 1
-         */
+     
         int pendingStatusId =
                 statusDAO
                         .findStatusIdByCode("PENDING")
@@ -98,22 +85,11 @@ public class AppointmentServiceImpl
                 pendingStatusId
         );
 
-        /*
-         * STEP 4
-         *
-         * We intentionally leave this null for now.
-         *
-         * The authenticated user ID will be supplied
-         * from the HTTP session by the AppointmentServlet.
-         */
+       
         appointment.setLastModifiedByUserId(
-                null
+        request.getRequestingUserId()
         );
 
-        /*
-         * STEP 5
-         * Save the appointment.
-         */
         return appointmentDAO.save(
                 appointment
         );

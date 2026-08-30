@@ -15,5 +15,9 @@ public interface PatientDAO {
         Connection connection
 ) throws SQLException;
     
-    Optional<Patient> findById(int patientId) throws SQLException;
+    Optional<Patient> findById(int patientId) 
+        throws SQLException;
+    
+    Optional<Patient> findByUserId(int userId)
+        throws SQLException;
 }

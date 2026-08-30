@@ -23,6 +23,12 @@ public class BasicAppointmentValidationHandler
             );
         }
 
+        if (request.getRequestingUserId() <= 0) {
+            throw new ValidationException(
+                    "Authenticated user information is required."
+            );
+        }
+        
         if (request.getServiceId() <= 0) {
             throw new ValidationException(
                     "A valid dental service is required."

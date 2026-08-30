@@ -8,9 +8,12 @@ public class AppointmentRequestDTO {
     private int patientId;
     private int serviceId;
     private Integer doctorId;
+    private int requestingUserId;
 
     private LocalDate requestedDate;
     private LocalTime requestedTime;
+    
+    
 
     private String patientReason;
 
@@ -27,6 +30,14 @@ public class AppointmentRequestDTO {
 
     public int getServiceId() {
         return serviceId;
+    }
+    
+    public int getRequestingUserId() {
+    return requestingUserId;
+}
+
+    public void setRequestingUserId(int requestingUserId) {
+        this.requestingUserId = requestingUserId;
     }
 
     public void setServiceId(int serviceId) {
