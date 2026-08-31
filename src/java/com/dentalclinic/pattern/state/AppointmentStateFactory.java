@@ -21,6 +21,9 @@ public class AppointmentStateFactory {
 
             case "AWAITING_DOCTOR_APPROVAL" ->
                     new AwaitingDoctorApprovalState();
+                
+            case "DOCTOR_APPROVED" ->
+                    new DoctorApprovedAppointmentState();
 
             default ->
                     new UnsupportedAppointmentState(

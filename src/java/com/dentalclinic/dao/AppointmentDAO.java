@@ -40,4 +40,9 @@ public interface AppointmentDAO {
         int changedByUserId,
         String reason
 ) throws SQLException;
+    
+    boolean updateStatusAsExternalActor(
+        int appointmentId,
+        int statusId
+) throws SQLException;
 }

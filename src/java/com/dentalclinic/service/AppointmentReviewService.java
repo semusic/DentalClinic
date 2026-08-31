@@ -21,8 +21,8 @@ public interface AppointmentReviewService {
         int assistantUserId
     ) throws SQLException, ValidationException;
 
-    void sendToDoctor(
-            int appointmentId,
-            int assistantUserId
+    String sendToDoctor(
+        int appointmentId,
+        int assistantUserId
     ) throws SQLException, ValidationException;
 }

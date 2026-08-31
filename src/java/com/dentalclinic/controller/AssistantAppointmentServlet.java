@@ -190,15 +190,21 @@ public class AssistantAppointmentServlet extends HttpServlet {
              */
             if ("sendToDoctor".equalsIgnoreCase(action)) {
 
-                appointmentReviewService.sendToDoctor(
-                        appointmentId,
-                        assistantUserId
-                );
+                String approvalToken =
+                    appointmentReviewService.sendToDoctor(
+                            appointmentId,
+                            assistantUserId
+                    );
 
-                response.sendRedirect(
-                        request.getContextPath()
-                        + "/assistant/appointments"
-                );
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/assistant/appointments"
+                    + "?doctorToken="
+                    + java.net.URLEncoder.encode(
+                            approvalToken,
+                            java.nio.charset.StandardCharsets.UTF_8
+                    )
+            );
 
                 return;
             }

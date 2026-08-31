@@ -2,6 +2,11 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.dentalclinic.dto.AppointmentReviewDTO" %>
 
+<%
+    String doctorToken =
+            request.getParameter("doctorToken");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -228,6 +233,51 @@
 
 
 <main class="container">
+    
+        <%
+        if (doctorToken != null
+                && !doctorToken.isBlank()) {
+    %>
+
+    <div style="
+        background:#e8f7ef;
+        border:1px solid #b7e4ca;
+        color:#17663a;
+        padding:18px;
+        border-radius:12px;
+        margin-bottom:25px;
+    ">
+
+        <strong>
+            Appointment sent to doctor successfully.
+        </strong>
+
+        <p style="margin-bottom:10px;">
+            The secure approval link generated for testing is:
+        </p>
+
+        <input
+            type="text"
+            readonly
+            value="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}/doctor/approval?token=<%= doctorToken %>"
+            style="
+                width:100%;
+                padding:10px;
+                border:1px solid #cbd5e1;
+                border-radius:8px;
+            "
+            onclick="this.select()">
+
+        <p style="font-size:13px;">
+            In the final version this link will be delivered
+            to the doctor through the notification service.
+        </p>
+
+    </div>
+
+    <%
+        }
+    %>
 
     <div class="page-header">
 

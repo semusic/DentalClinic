@@ -164,6 +164,15 @@ public class AppointmentDAOImpl implements AppointmentDAO {
     WHERE appointment_id = ?
     """;
 
+    
+    private static final String UPDATE_STATUS_EXTERNAL = """
+    UPDATE appointments
+    SET
+        status_id = ?,
+        last_modified_by_user_id = NULL
+    WHERE appointment_id = ?
+    """;
+    
     @Override
     public int save(Appointment appointment)
             throws SQLException {
@@ -643,6 +652,32 @@ public boolean updateStatus(
         statement.setInt(2, changedByUserId);
         statement.setInt(3, changedByUserId);
         statement.setInt(4, appointmentId);
+
+        return statement.executeUpdate() > 0;
+    }
+}
+
+@Override
+public boolean updateStatusAsExternalActor(
+        int appointmentId,
+        int statusId
+) throws SQLException {
+
+    try (Connection connection =
+                 DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(
+                         UPDATE_STATUS_EXTERNAL)) {
+
+        statement.setInt(
+                1,
+                statusId
+        );
+
+        statement.setInt(
+                2,
+                appointmentId
+        );
 
         return statement.executeUpdate() > 0;
     }

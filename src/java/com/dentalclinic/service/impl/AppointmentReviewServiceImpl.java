@@ -13,6 +13,8 @@ import com.dentalclinic.pattern.state.AppointmentStateContext;
 import com.dentalclinic.pattern.state.AppointmentStateFactory;
 import com.dentalclinic.service.AppointmentReviewService;
 
+import com.dentalclinic.model.DoctorApprovalToken;
+import com.dentalclinic.service.DoctorApprovalService;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,7 @@ public class AppointmentReviewServiceImpl
     private final AppointmentDAO appointmentDAO;
     private final AppointmentStatusDAO statusDAO;
     private final AppointmentStateFactory stateFactory;
+    private final DoctorApprovalService doctorApprovalService;
 
     public AppointmentReviewServiceImpl() {
 
@@ -38,6 +41,9 @@ public class AppointmentReviewServiceImpl
 
         this.stateFactory =
                 new AppointmentStateFactory();
+        
+        this.doctorApprovalService =
+                new DoctorApprovalServiceImpl();
     }
 
     @Override
@@ -72,7 +78,7 @@ public class AppointmentReviewServiceImpl
     }
 
     @Override
-    public void sendToDoctor(
+    public String sendToDoctor(
             int appointmentId,
             int assistantUserId
     ) throws SQLException, ValidationException {
@@ -83,6 +89,14 @@ public class AppointmentReviewServiceImpl
                 "AWAITING_DOCTOR_APPROVAL",
                 "Appointment sent to doctor for approval."
         );
+
+        DoctorApprovalToken token =
+                doctorApprovalService.createApproval(
+                        appointmentId,
+                        assistantUserId
+                );
+
+        return token.getRawToken();
     }
 
     private void transitionAppointment(
