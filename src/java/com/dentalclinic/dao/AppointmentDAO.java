@@ -33,4 +33,11 @@ public interface AppointmentDAO {
             LocalDateTime scheduledEnd,
             Integer excludeAppointmentId
     ) throws SQLException;
+    
+    boolean updateStatus(
+        int appointmentId,
+        int statusId,
+        int changedByUserId,
+        String reason
+) throws SQLException;
 }

@@ -153,6 +153,16 @@ public class AppointmentDAOImpl implements AppointmentDAO {
               OR a.appointment_id <> ?
           )
         """;
+    
+    private static final String UPDATE_STATUS = """
+    UPDATE appointments
+    SET
+        status_id = ?,
+        last_modified_by_user_id = ?,
+        reviewed_by_user_id = ?,
+        reviewed_at = CURRENT_TIMESTAMP
+    WHERE appointment_id = ?
+    """;
 
     @Override
     public int save(Appointment appointment)
@@ -609,4 +619,32 @@ public class AppointmentDAOImpl implements AppointmentDAO {
 
         return appointment;
     }
+    
+    @Override
+public boolean updateStatus(
+        int appointmentId,
+        int statusId,
+        int changedByUserId,
+        String reason
+) throws SQLException {
+
+    /*
+     * The reason is recorded by the database trigger
+     * when the status changes. It is accepted here
+     * for future workflow/audit extensions.
+     */
+    try (Connection connection =
+                 DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(
+                         UPDATE_STATUS)) {
+
+        statement.setInt(1, statusId);
+        statement.setInt(2, changedByUserId);
+        statement.setInt(3, changedByUserId);
+        statement.setInt(4, appointmentId);
+
+        return statement.executeUpdate() > 0;
+    }
+}
 }
