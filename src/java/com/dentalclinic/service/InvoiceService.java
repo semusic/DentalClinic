@@ -13,6 +13,10 @@ public interface InvoiceService {
             int visitId,
             int cashierUserId
     ) throws SQLException, ValidationException;
+    
+    String generateQrToken(
+            int invoiceId
+    ) throws SQLException, ValidationException;
 
     Invoice getInvoice(
             int invoiceId

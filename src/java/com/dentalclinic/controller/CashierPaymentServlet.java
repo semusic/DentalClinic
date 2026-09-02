@@ -336,6 +336,19 @@ public class CashierPaymentServlet
                             cashierUserId
                     );
 
+            Invoice updatedInvoice =
+                    invoiceService.getInvoice(
+                            invoiceId
+                    );
+
+            if ("PAID".equalsIgnoreCase(
+                    updatedInvoice.getInvoiceStatus())) {
+
+                invoiceService.generateQrToken(
+                        invoiceId
+                );
+            }
+            
             response.sendRedirect(
                     request.getContextPath()
                     + "/cashier/payments"

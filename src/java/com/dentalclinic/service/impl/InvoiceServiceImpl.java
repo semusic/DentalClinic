@@ -20,6 +20,7 @@ import com.dentalclinic.model.InvoiceItem;
 import com.dentalclinic.model.PatientVisit;
 import com.dentalclinic.model.Service;
 import com.dentalclinic.model.VisitService;
+import com.dentalclinic.service.QrTokenService;
 
 import com.dentalclinic.service.InvoiceService;
 
@@ -41,9 +42,11 @@ public class InvoiceServiceImpl
     private final PatientVisitDAO patientVisitDAO;
     private final AppointmentDAO appointmentDAO;
     private final ServiceDAO serviceDAO;
-    private final VisitServiceServiceImpl
-            visitServiceService;
+    private final VisitServiceServiceImpl visitServiceService;
 
+    private final QrTokenService qrTokenService;
+    
+    
     public InvoiceServiceImpl() {
 
         this.invoiceDAO =
@@ -63,6 +66,9 @@ public class InvoiceServiceImpl
 
         this.visitServiceService =
                 new VisitServiceServiceImpl();
+        
+        this.qrTokenService =
+                new QrTokenService();
     }
 
     @Override
@@ -466,4 +472,68 @@ public void voidInvoice(
             );
         }
     }
+        @Override
+    public String generateQrToken(
+            int invoiceId
+    ) throws SQLException, ValidationException {
+
+        if (invoiceId <= 0) {
+
+            throw new ValidationException(
+                    "Invalid invoice."
+            );
+        }
+
+        Invoice invoice =
+                invoiceDAO.findById(
+                        invoiceId
+                ).orElseThrow(() ->
+                        new ValidationException(
+                                "Invoice could not be found."
+                        )
+                );
+
+        /*
+         * QR should only be issued for a paid bill.
+         */
+        if (!"PAID".equalsIgnoreCase(
+                invoice.getInvoiceStatus())) {
+
+            throw new ValidationException(
+                    "A patient QR can only be generated after payment is completed."
+            );
+        }
+
+        /*
+         * Generate a fresh random token.
+         */
+        String rawToken =
+                qrTokenService.generateToken();
+
+        String hash =
+                qrTokenService.hashToken(
+                        rawToken
+                );
+
+        boolean saved =
+        invoiceDAO.saveQrToken(
+                invoiceId,
+                rawToken,
+                hash
+        );
+
+        if (!saved) {
+
+            throw new SQLException(
+                    "Unable to save QR token."
+            );
+        }
+
+        /*
+         * Return the raw token only to the current
+         * receipt-generation request.
+         */
+        return rawToken;
+    }
+
 }

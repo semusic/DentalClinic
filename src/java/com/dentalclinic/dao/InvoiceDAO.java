@@ -31,4 +31,14 @@ public interface InvoiceDAO {
             int voidedByUserId,
             String voidReason
     ) throws SQLException;
+    
+   boolean saveQrToken(
+            int invoiceId,
+            String qrToken,
+            String qrTokenHash
+    ) throws SQLException;
+
+    Optional<Invoice> findByQrTokenHash(
+            String qrTokenHash
+    ) throws SQLException;
 }

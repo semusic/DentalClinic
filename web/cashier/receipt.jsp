@@ -30,6 +30,25 @@
                     request.getAttribute(
                             "invoiceItems"
                     );
+
+    /*
+     * The QR is available when a secure QR token
+     * has been generated for this paid invoice.
+     */
+    boolean qrAvailable =
+            invoice.getQrToken() != null
+            && !invoice.getQrToken().isBlank();
+
+    String encodedQrToken = "";
+
+    if (qrAvailable) {
+
+        encodedQrToken =
+                java.net.URLEncoder.encode(
+                        invoice.getQrToken(),
+                        java.nio.charset.StandardCharsets.UTF_8
+                );
+    }
 %>
 
 <!DOCTYPE html>
@@ -55,21 +74,38 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f9fc;
-            color: #263238;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            background:
+                #f5f9fc;
+
+            color:
+                #263238;
         }
 
         .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 20px;
+            max-width:
+                850px;
+
+            margin:
+                40px auto;
+
+            padding:
+                20px;
         }
 
         .receipt {
-            background: white;
-            padding: 35px;
-            border-radius: 16px;
+            background:
+                white;
+
+            padding:
+                35px;
+
+            border-radius:
+                16px;
 
             box-shadow:
                 0 8px 28px
@@ -77,9 +113,14 @@
         }
 
         .top {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            gap:
+                20px;
 
             border-bottom:
                 1px solid #edf2f7;
@@ -89,125 +130,410 @@
         }
 
         .brand {
-            font-size: 26px;
-            font-weight: 700;
-            color: #1677a5;
+            font-size:
+                26px;
+
+            font-weight:
+                700;
+
+            color:
+                #1677a5;
         }
 
         h1 {
-            margin: 5px 0;
-            color: #183b56;
+            margin:
+                5px 0;
+
+            color:
+                #183b56;
         }
 
         .muted {
-            color: #718096;
+            color:
+                #718096;
         }
 
         .receipt-number {
-            text-align: right;
-            font-weight: 700;
-            color: #183b56;
+            text-align:
+                right;
+
+            font-weight:
+                700;
+
+            color:
+                #183b56;
         }
 
         .details {
-            display: grid;
+            display:
+                grid;
+
             grid-template-columns:
                 repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 25px;
+
+            gap:
+                14px;
+
+            margin-top:
+                25px;
         }
 
         .detail {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
+            background:
+                #f8fafc;
+
+            padding:
+                15px;
+
+            border-radius:
+                10px;
         }
 
         .label {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 5px;
+            font-size:
+                12px;
+
+            color:
+                #718096;
+
+            margin-bottom:
+                5px;
         }
 
         .value {
-            font-weight: 700;
+            font-weight:
+                700;
+
+            word-break:
+                break-word;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
+            width:
+                100%;
+
+            border-collapse:
+                collapse;
+
+            margin-top:
+                30px;
         }
 
         th,
         td {
-            padding: 13px 8px;
+            padding:
+                13px 8px;
+
             border-bottom:
                 1px solid #edf2f7;
-            text-align: left;
+
+            text-align:
+                left;
         }
 
         th {
-            font-size: 12px;
-            color: #718096;
+            font-size:
+                12px;
+
+            color:
+                #718096;
         }
 
         .right {
-            text-align: right;
+            text-align:
+                right;
         }
 
         .paid {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            background: #edf9f2;
-            color: #18794e;
+            margin-top:
+                25px;
+
+            padding:
+                20px;
+
+            border-radius:
+                12px;
+
+            background:
+                #edf9f2;
+
+            color:
+                #18794e;
         }
 
         .paid-amount {
-            margin-top: 6px;
-            font-size: 25px;
-            font-weight: 700;
+            margin-top:
+                6px;
+
+            font-size:
+                25px;
+
+            font-weight:
+                700;
         }
 
-        .actions {
-            margin-top: 25px;
+        /*
+         * QR SECTION
+         */
+        .qr-section {
+            margin-top:
+                30px;
 
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            padding:
+                25px;
+
+            text-align:
+                center;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius:
+                12px;
+
+            background:
+                #fafcfd;
+
+            page-break-inside:
+                avoid;
+        }
+
+        .qr-section h2 {
+            margin:
+                0 0 8px;
+
+            color:
+                #183b56;
+
+            font-size:
+                20px;
+        }
+
+        .qr-section p {
+            margin:
+                6px 0;
+
+            color:
+                #718096;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.5;
+        }
+
+        .qr-image {
+            display:
+                block;
+
+            width:
+                280px;
+
+            height:
+                280px;
+
+            margin:
+                20px auto;
+
+            image-rendering:
+                pixelated;
+        }
+
+        .qr-note {
+            margin-bottom:
+                0;
+
+            font-size:
+                12px !important;
+
+            color:
+                #718096;
+        }
+
+        .qr-unavailable {
+            margin-top:
+                30px;
+
+            padding:
+                18px;
+
+            border-radius:
+                10px;
+
+            background:
+                #fffaf0;
+
+            color:
+                #946200;
+
+            text-align:
+                center;
+        }
+
+        /*
+         * ACTIONS
+         */
+        .actions {
+            margin-top:
+                25px;
+
+            display:
+                flex;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
         }
 
         .button {
-            padding: 11px 18px;
-            border-radius: 9px;
-            background: #1677a5;
-            color: white;
-            text-decoration: none;
-            font-weight: 700;
+            padding:
+                11px 18px;
+
+            border:
+                none;
+
+            border-radius:
+                9px;
+
+            background:
+                #1677a5;
+
+            color:
+                white;
+
+            text-decoration:
+                none;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
+            font-size:
+                14px;
+
+            display:
+                inline-block;
         }
 
         .secondary {
-            background: #eef2f5;
-            color: #374151;
+            background:
+                #eef2f5;
+
+            color:
+                #374151;
         }
 
-        @media (max-width: 650px) {
+        /*
+         * PRINT
+         */
+        @media print {
 
-            .top {
-                flex-direction: column;
+            body {
+                background:
+                    white;
             }
 
-            .receipt-number {
-                text-align: left;
+            .no-print {
+                display:
+                    none !important;
             }
 
-            .details {
-                grid-template-columns: 1fr;
+            .container {
+                margin:
+                    0 !important;
+
+                max-width:
+                    none !important;
+
+                padding:
+                    0 !important;
             }
 
             .receipt {
-                padding: 22px;
+                box-shadow:
+                    none !important;
+
+                border:
+                    none !important;
+
+                border-radius:
+                    0 !important;
+
+                padding:
+                    15px !important;
+            }
+
+            .qr-section {
+                page-break-inside:
+                    avoid;
+            }
+
+            .qr-image {
+                width:
+                    250px;
+
+                height:
+                    250px;
+            }
+        }
+
+        /*
+         * MOBILE
+         */
+        @media (max-width: 650px) {
+
+            .container {
+                margin:
+                    15px auto;
+
+                padding:
+                    10px;
+            }
+
+            .receipt {
+                padding:
+                    22px;
+            }
+
+            .top {
+                flex-direction:
+                    column;
+            }
+
+            .receipt-number {
+                text-align:
+                    left;
+            }
+
+            .details {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .qr-image {
+                width:
+                    240px;
+
+                height:
+                    240px;
+            }
+
+            .actions {
+                flex-direction:
+                    column;
+            }
+
+            .button {
+                text-align:
+                    center;
+
+                width:
+                    100%;
             }
         }
 
@@ -220,6 +546,8 @@
 <main class="container">
 
     <div class="receipt">
+
+        <!-- HEADER -->
 
         <div class="top">
 
@@ -252,6 +580,8 @@
 
         </div>
 
+
+        <!-- RECEIPT DETAILS -->
 
         <div class="details">
 
@@ -347,6 +677,8 @@
         </div>
 
 
+        <!-- SERVICES -->
+
         <table>
 
             <thead>
@@ -372,7 +704,8 @@
             <tbody>
 
             <%
-                if (items != null) {
+                if (items != null
+                        && !items.isEmpty()) {
 
                     for (InvoiceItem item :
                             items) {
@@ -381,11 +714,15 @@
                 <tr>
 
                     <td>
+
                         <%= item.getItemDescription() %>
+
                     </td>
 
                     <td>
+
                         <%= item.getQuantity() %>
+
                     </td>
 
                     <td class="right">
@@ -399,6 +736,21 @@
 
             <%
                     }
+
+                } else {
+            %>
+
+                <tr>
+
+                    <td colspan="3">
+
+                        No invoice items found.
+
+                    </td>
+
+                </tr>
+
+            <%
                 }
             %>
 
@@ -406,6 +758,8 @@
 
         </table>
 
+
+        <!-- PAYMENT -->
 
         <div class="paid">
 
@@ -423,6 +777,7 @@
             <div style="margin-top:6px;">
 
                 Payment Status:
+
                 <strong>
                     <%= payment.getPaymentStatus() %>
                 </strong>
@@ -432,7 +787,58 @@
         </div>
 
 
-        <div class="actions">
+        <!-- QR CODE -->
+
+        <% if (qrAvailable) { %>
+
+        <div class="qr-section">
+
+            <h2>
+                Patient Visit QR
+            </h2>
+
+            <p>
+
+                Scan this QR code with a phone to
+                view the patient's visit record.
+
+            </p>
+
+
+            <img
+                class="qr-image"
+                src="${pageContext.request.contextPath}/qr?t=<%= encodedQrToken %>"
+                alt="Secure patient visit QR code">
+
+
+            <p class="qr-note">
+
+                Keep this receipt for future reference.
+
+            </p>
+
+        </div>
+
+        <% } else { %>
+
+        <div class="qr-unavailable">
+
+            <strong>
+                Patient Visit QR is not available
+            </strong>
+
+            <br><br>
+
+            This receipt does not yet have a QR token.
+
+        </div>
+
+        <% } %>
+
+
+        <!-- NAVIGATION ACTIONS -->
+
+        <div class="actions no-print">
 
             <a
                 class="button secondary"
@@ -448,6 +854,41 @@
                 href="${pageContext.request.contextPath}/cashier/payments?invoiceId=<%= invoice.getInvoiceId() %>">
 
                 Payment History
+
+            </a>
+
+        </div>
+
+
+        <!-- PRINT / SAVE -->
+
+        <div class="actions no-print">
+
+            <button
+                type="button"
+                class="button"
+                onclick="window.print()">
+
+                🖨 Print Receipt
+
+            </button>
+
+
+            <button
+                type="button"
+                class="button"
+                onclick="window.print()">
+
+                ↓ Save PDF
+
+            </button>
+
+
+            <a
+                class="button secondary"
+                href="${pageContext.request.contextPath}/cashier/invoice-history">
+
+                Invoice History
 
             </a>
 

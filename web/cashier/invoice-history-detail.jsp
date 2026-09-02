@@ -413,6 +413,31 @@
             }
 
         }
+        
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .invoice {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .container {
+                margin: 0 !important;
+                max-width: none !important;
+                padding: 0 !important;
+            }
+
+        }
 
     </style>
 
@@ -845,6 +870,39 @@
 
         </div>
 
+            <div class="actions no-print">
+
+                <button
+                    type="button"
+                    class="button"
+                    onclick="window.print()">
+
+                    🖨 Print
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="button"
+                    onclick="window.print()">
+
+                    ↓ Save PDF
+
+                </button>
+
+
+                <a
+                    class="button secondary"
+                    href="${pageContext.request.contextPath}/cashier/invoice-history">
+
+                    ← Invoice History
+
+                </a>
+
+            </div>
+            
+            
     </div>
 
 </main>

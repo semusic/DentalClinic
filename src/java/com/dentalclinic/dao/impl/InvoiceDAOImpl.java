@@ -50,6 +50,9 @@ public class InvoiceDAOImpl
             voided_at,
             voided_by_user_id,
             void_reason,
+            qr_token,
+            qr_token_hash,
+            qr_generated_at,                                 
             created_at,
             updated_at
         FROM invoices
@@ -73,6 +76,9 @@ public class InvoiceDAOImpl
             voided_at,
             voided_by_user_id,
             void_reason,
+            qr_token,
+            qr_token_hash,
+            qr_generated_at,                                                   
             created_at,
             updated_at
         FROM invoices
@@ -96,6 +102,9 @@ public class InvoiceDAOImpl
             voided_at,
             voided_by_user_id,
             void_reason,
+            qr_token,
+            qr_token_hash,
+            qr_generated_at,
             created_at,
             updated_at
         FROM invoices
@@ -123,6 +132,9 @@ public class InvoiceDAOImpl
             voided_at,
             voided_by_user_id,
             void_reason,
+            qr_token,
+            qr_token_hash,
+            qr_generated_at,                                           
             created_at,
             updated_at
         FROM invoices
@@ -144,6 +156,41 @@ public class InvoiceDAOImpl
             void_reason = ?
         WHERE invoice_id = ?
           AND invoice_status = 'UNPAID'
+        """;
+    
+    private static final String SAVE_QR_TOKEN = """
+    UPDATE invoices
+    SET
+        qr_token = ?,
+        qr_token_hash = ?,
+        qr_generated_at = CURRENT_TIMESTAMP
+    WHERE invoice_id = ?
+    """;
+
+    private static final String FIND_BY_QR_TOKEN_HASH = """
+        SELECT
+            invoice_id,
+            visit_id,
+            patient_id,
+            invoice_number,
+            subtotal,
+            discount_amount,
+            tax_amount,
+            total_amount,
+            invoice_status,
+            issued_at,
+            due_date,
+            created_by_user_id,
+            voided_at,
+            voided_by_user_id,
+            void_reason,
+            qr_token,
+            qr_token_hash,
+            qr_generated_at,
+            created_at,
+            updated_at
+        FROM invoices
+        WHERE qr_token_hash = ?
         """;
 
     @Override
@@ -507,6 +554,30 @@ public class InvoiceDAOImpl
                         "void_reason"
                 )
         );
+        
+        invoice.setQrToken(
+        resultSet.getString(
+                "qr_token"
+        )
+        );
+
+        invoice.setQrTokenHash(
+                resultSet.getString(
+                        "qr_token_hash"
+                )
+            );
+
+        Timestamp qrGeneratedAt =
+                resultSet.getTimestamp(
+                        "qr_generated_at"
+                );
+
+        if (qrGeneratedAt != null) {
+
+            invoice.setQrGeneratedAt(
+                    qrGeneratedAt.toLocalDateTime()
+            );
+        }
 
         Timestamp createdAt =
                 resultSet.getTimestamp(
@@ -534,4 +605,69 @@ public class InvoiceDAOImpl
 
         return invoice;
     }
+    
+            @Override
+         public boolean saveQrToken(
+                 int invoiceId,
+                 String qrToken,
+                 String qrTokenHash
+         ) throws SQLException {
+
+             try (Connection connection =
+                          DatabaseConnection.getConnection();
+                  PreparedStatement statement =
+                          connection.prepareStatement(
+                                  SAVE_QR_TOKEN)) {
+
+                 statement.setString(
+                         1,
+                         qrToken
+                 );
+
+                 statement.setString(
+                         2,
+                         qrTokenHash
+                 );
+
+                 statement.setInt(
+                         3,
+                         invoiceId
+                 );
+
+                 return statement.executeUpdate() > 0;
+             }
+         }
+
+        @Override
+        public Optional<Invoice>
+        findByQrTokenHash(
+                String qrTokenHash
+        ) throws SQLException {
+
+            try (Connection connection =
+                         DatabaseConnection.getConnection();
+                 PreparedStatement statement =
+                         connection.prepareStatement(
+                                 FIND_BY_QR_TOKEN_HASH)) {
+
+                statement.setString(
+                        1,
+                        qrTokenHash
+                );
+
+                try (ResultSet resultSet =
+                             statement.executeQuery()) {
+
+                    if (resultSet.next()) {
+
+                        return Optional.of(
+                                mapInvoice(resultSet)
+                        );
+                    }
+                }
+            }
+
+            return Optional.empty();
+        }
+    
 }

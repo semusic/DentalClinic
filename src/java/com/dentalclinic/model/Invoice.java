@@ -9,6 +9,10 @@ public class Invoice {
     private int invoiceId;
     private int visitId;
     private int patientId;
+    
+    private String qrTokenHash;
+    private LocalDateTime qrGeneratedAt;
+    private String qrToken;
 
     private String invoiceNumber;
 
@@ -168,5 +172,35 @@ public class Invoice {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public String getQrTokenHash() {
+        return qrTokenHash;
+    }
+
+    public void setQrTokenHash(
+            String qrTokenHash) {
+
+        this.qrTokenHash = qrTokenHash;
+    }
+
+    public LocalDateTime getQrGeneratedAt() {
+        return qrGeneratedAt;
+    }
+
+    public void setQrGeneratedAt(
+            LocalDateTime qrGeneratedAt) {
+
+        this.qrGeneratedAt = qrGeneratedAt;
+    }
+    
+    public String getQrToken() {
+    return qrToken;
+}
+
+    public void setQrToken(
+           String qrToken) {
+
+        this.qrToken = qrToken;
     }
 }
