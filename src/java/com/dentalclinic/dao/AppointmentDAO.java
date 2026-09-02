@@ -5,18 +5,27 @@ import com.dentalclinic.model.Appointment;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface AppointmentDAO {
 
-    int save(Appointment appointment) throws SQLException;
+    int save(
+            Appointment appointment
+    ) throws SQLException;
 
-    Optional<Appointment> findById(int appointmentId)
-            throws SQLException;
+    Optional<Appointment> findById(
+            int appointmentId
+    ) throws SQLException;
 
-    List<Appointment> findByPatientId(int patientId)
-            throws SQLException;
+    Optional<Appointment> findByVisitId(
+            int visitId
+    ) throws SQLException;
+
+    List<Appointment> findByPatientId(
+            int patientId
+    ) throws SQLException;
 
     List<Appointment> findPendingRequests()
             throws SQLException;
@@ -24,7 +33,7 @@ public interface AppointmentDAO {
     boolean existsRequestedSlot(
             int doctorId,
             LocalDate requestedDate,
-            java.time.LocalTime requestedTime
+            LocalTime requestedTime
     ) throws SQLException;
 
     boolean hasScheduleConflict(
@@ -33,16 +42,16 @@ public interface AppointmentDAO {
             LocalDateTime scheduledEnd,
             Integer excludeAppointmentId
     ) throws SQLException;
-    
+
     boolean updateStatus(
-        int appointmentId,
-        int statusId,
-        int changedByUserId,
-        String reason
-) throws SQLException;
-    
+            int appointmentId,
+            int statusId,
+            int changedByUserId,
+            String reason
+    ) throws SQLException;
+
     boolean updateStatusAsExternalActor(
-        int appointmentId,
-        int statusId
-) throws SQLException;
+            int appointmentId,
+            int statusId
+    ) throws SQLException;
 }

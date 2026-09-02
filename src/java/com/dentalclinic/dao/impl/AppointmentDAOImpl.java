@@ -173,6 +173,33 @@ public class AppointmentDAOImpl implements AppointmentDAO {
     WHERE appointment_id = ?
     """;
     
+    private static final String FIND_BY_VISIT_ID = """
+    SELECT
+        a.appointment_id,
+        a.patient_id,
+        a.service_id,
+        a.doctor_id,
+        a.requested_date,
+        a.requested_time,
+        a.scheduled_start,
+        a.scheduled_end,
+        a.status_id,
+        s.status_code,
+        a.patient_reason,
+        a.reviewed_by_user_id,
+        a.reviewed_at,
+        a.cancellation_reason,
+        a.last_modified_by_user_id,
+        a.created_at,
+        a.updated_at
+    FROM appointments a
+    INNER JOIN appointment_statuses s
+        ON a.status_id = s.status_id
+    INNER JOIN patient_visits pv
+        ON pv.appointment_id = a.appointment_id
+    WHERE pv.visit_id = ?
+    """;
+    
     @Override
     public int save(Appointment appointment)
             throws SQLException {
@@ -350,6 +377,37 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         return Optional.empty();
     }
 
+    @Override
+public Optional<Appointment> findByVisitId(
+        int visitId
+) throws SQLException {
+
+    try (Connection connection =
+                 DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(
+                         FIND_BY_VISIT_ID)) {
+
+        statement.setInt(
+                1,
+                visitId
+        );
+
+        try (ResultSet resultSet =
+                     statement.executeQuery()) {
+
+            if (resultSet.next()) {
+
+                return Optional.of(
+                        mapAppointment(resultSet)
+                );
+            }
+        }
+    }
+
+    return Optional.empty();
+}
+    
     @Override
     public List<Appointment> findByPatientId(
             int patientId
