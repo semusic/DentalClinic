@@ -1,608 +1,135 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <%@ page import="java.util.List" %>
 <%@ page import="com.dentalclinic.model.Invoice" %>
 <%@ page import="com.dentalclinic.model.InvoiceItem" %>
 
 <%
-    Invoice invoice =
-            (Invoice)
-                    request.getAttribute("invoice");
-
-    List<InvoiceItem> items =
-            (List<InvoiceItem>)
-                    request.getAttribute("invoiceItems");
+    Invoice invoice = (Invoice) request.getAttribute("invoice");
+    List<InvoiceItem> items = (List<InvoiceItem>) request.getAttribute("invoiceItems");
 %>
 
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        DentalCare | Invoice
-    </title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-
-            font-family: Arial, sans-serif;
-
-            background: #f5f9fc;
-
-            color: #263238;
-        }
-
-        .container {
-            max-width: 850px;
-
-            margin:
-                40px auto;
-
-            padding:
-                20px;
-        }
-
-        .invoice {
-            background:
-                white;
-
-            padding:
-                35px;
-
-            border-radius:
-                16px;
-
-            box-shadow:
-                0 8px 28px
-                rgba(0, 0, 0, 0.06);
-        }
-
-        .header {
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                flex-start;
-
-            gap:
-                20px;
-
-            border-bottom:
-                1px solid #edf2f7;
-
-            padding-bottom:
-                25px;
-        }
-
-        .clinic {
-            font-size:
-                26px;
-
-            font-weight:
-                700;
-
-            color:
-                #1677a5;
-        }
-
-        .invoice-title {
-            color:
-                #183b56;
-
-            font-size:
-                14px;
-
-            font-weight:
-                700;
-
-            text-align:
-                right;
-        }
-
-        .invoice-number {
-            margin-top:
-                5px;
-
-            color:
-                #718096;
-        }
-
-        .patient-box {
-            margin-top:
-                25px;
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap:
-                15px;
-        }
-
-        .detail {
-            background:
-                #f8fafc;
-
-            padding:
-                15px;
-
-            border-radius:
-                10px;
-        }
-
-        .label {
-            font-size:
-                12px;
-
-            color:
-                #718096;
-
-            margin-bottom:
-                5px;
-        }
-
-        .value {
-            font-weight:
-                700;
-        }
-
-        table {
-            width:
-                100%;
-
-            border-collapse:
-                collapse;
-
-            margin-top:
-                30px;
-        }
-
-        th,
-        td {
-            padding:
-                13px 8px;
-
-            border-bottom:
-                1px solid #edf2f7;
-
-            text-align:
-                left;
-        }
-
-        th {
-            color:
-                #718096;
-
-            font-size:
-                12px;
-        }
-
-        .amount {
-            text-align:
-                right;
-        }
-
-        .totals {
-            margin-top:
-                20px;
-
-            margin-left:
-                auto;
-
-            max-width:
-                320px;
-        }
-
-        .total-row {
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            padding:
-                8px 0;
-        }
-
-        .grand-total {
-            border-top:
-                2px solid #183b56;
-
-            margin-top:
-                8px;
-
-            padding-top:
-                12px;
-
-            font-size:
-                20px;
-
-            font-weight:
-                700;
-
-            color:
-                #183b56;
-        }
-
-        .status {
-            display:
-                inline-block;
-
-            margin-top:
-                25px;
-
-            padding:
-                8px 14px;
-
-            border-radius:
-                20px;
-
-            background:
-                #fff4dc;
-
-            color:
-                #946200;
-
-            font-weight:
-                700;
-
-            font-size:
-                12px;
-        }
-
-        .actions {
-            margin-top:
-                25px;
-
-            display:
-                flex;
-
-            gap:
-                10px;
-
-            flex-wrap:
-                wrap;
-        }
-
-        .button {
-            padding:
-                11px 18px;
-
-            border-radius:
-                9px;
-
-            background:
-                #1677a5;
-
-            color:
-                white;
-
-            text-decoration:
-                none;
-
-            font-weight:
-                700;
-        }
-
-        .secondary {
-            background:
-                #eef2f5;
-
-            color:
-                #374151;
-        }
-
-        @media (max-width: 650px) {
-
-            .header {
-                flex-direction:
-                    column;
-            }
-
-            .invoice-title {
-                text-align:
-                    left;
-            }
-
-            .patient-box {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .invoice {
-                padding:
-                    22px;
-            }
-
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Invoice Detail</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<main class="container">
-
-    <div class="invoice">
-
-        <div class="header">
-
-            <div>
-
-                <div class="clinic">
-                    DentalCare
-                </div>
-
-                <div style="
-                    margin-top:5px;
-                    color:#718096;">
-
-                    Dental Clinic Management System
-
-                </div>
-
-            </div>
-
-
-            <div class="invoice-title">
-
-                INVOICE
-
-                <div class="invoice-number">
-
-                    <%= invoice.getInvoiceNumber() %>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="patient-box">
-
-            <div class="detail">
-
-                <div class="label">
-                    Invoice ID
-                </div>
-
-                <div class="value">
-
-                    <%= invoice.getInvoiceId() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Patient ID
-                </div>
-
-                <div class="value">
-
-                    <%= invoice.getPatientId() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Visit ID
-                </div>
-
-                <div class="value">
-
-                    <%= invoice.getVisitId() %>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Description
-                    </th>
-
-                    <th>
-                        Quantity
-                    </th>
-
-                    <th class="amount">
-                        Unit Price
-                    </th>
-
-                    <th class="amount">
-                        Total
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-            <%
-                if (items != null) {
-
-                    for (InvoiceItem item :
-                            items) {
-            %>
-
-                <tr>
-
-                    <td>
-
-                        <%= item.getItemDescription() %>
-
-                    </td>
-
-                    <td>
-
-                        <%= item.getQuantity() %>
-
-                    </td>
-
-                    <td class="amount">
-
-                        LKR
-                        <%= item.getUnitPrice() %>
-
-                    </td>
-
-                    <td class="amount">
-
-                        LKR
-                        <%= item.getLineTotal() %>
-
-                    </td>
-
-                </tr>
-
-            <%
-                    }
-                }
-            %>
-
-            </tbody>
-
-        </table>
-
-
-        <div class="totals">
-
-            <div class="total-row">
-
-                <span>
-                    Subtotal
-                </span>
-
-                <strong>
-
-                    LKR
-                    <%= invoice.getSubtotal() %>
-
-                </strong>
-
-            </div>
-
-
-            <div class="total-row">
-
-                <span>
-                    Discount
-                </span>
-
-                <strong>
-
-                    LKR
-                    <%= invoice.getDiscountAmount() %>
-
-                </strong>
-
-            </div>
-
-
-            <div class="total-row">
-
-                <span>
-                    Tax
-                </span>
-
-                <strong>
-
-                    LKR
-                    <%= invoice.getTaxAmount() %>
-
-                </strong>
-
-            </div>
-
-
-            <div class="total-row grand-total">
-
-                <span>
-                    TOTAL
-                </span>
-
-                <strong>
-
-                    LKR
-                    <%= invoice.getTotalAmount() %>
-
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="status">
-
-            <%= invoice.getInvoiceStatus() %>
-
-        </div>
-
-
-        <div class="actions">
-
-            <a
-                class="button"
-                href="${pageContext.request.contextPath}/cashier/payments?invoiceId=<%= invoice.getInvoiceId() %>">
-
-                Proceed to Payment
-
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
+                <span class="role-badge cashier">Cashier</span>
             </a>
 
+            <div class="nav-menu">
+                <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-link">Dashboard</a>
+                <a href="${pageContext.request.contextPath}/cashier/invoices" class="nav-link active">Invoices</a>
+                <a href="${pageContext.request.contextPath}/cashier/invoice-history" class="nav-link">Invoice History</a>
+            </div>
 
-            <a
-                class="button secondary"
-                href="${pageContext.request.contextPath}/cashier/invoices">
-
-                Back to Billing
-
-            </a>
-
+            <div class="nav-actions">
+                <a href="${pageContext.request.contextPath}/cashier/invoices" class="btn btn-secondary btn-sm">← Back to Invoices</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
+            </div>
         </div>
+    </header>
 
-    </div>
+    <main class="main-container">
+        <div class="card" style="max-width: 850px; margin: 0 auto; padding: 36px;">
+            <% if (invoice == null) { %>
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <h2>Invoice Not Found</h2>
+                </div>
+            <% } else { %>
 
-</main>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 24px;">
+                    <div>
+                        <div style="font-size: 26px; font-weight: 800; color: var(--primary);">DentalCare</div>
+                        <div style="font-size: 13px; color: var(--text-muted);">Clinic Management & Billing</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge badge-warning" style="font-size: 12px; margin-bottom: 4px;"><%= invoice.getInvoiceStatus() %></span>
+                        <h2 style="font-size: 20px; font-weight: 800; color: var(--text-heading);"><%= invoice.getInvoiceNumber() %></h2>
+                    </div>
+                </div>
+
+                <div class="grid-3" style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px;">
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">Invoice ID</span>
+                        <strong>#<%= invoice.getInvoiceId() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">Patient ID</span>
+                        <strong>#<%= invoice.getPatientId() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">Visit ID</span>
+                        <strong>#<%= invoice.getVisitId() %></strong>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-bottom: 24px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (items != null) {
+                                for (InvoiceItem item : items) {
+                            %>
+                                <tr>
+                                    <td><strong><%= item.getItemDescription() %></strong></td>
+                                    <td><%= item.getQuantity() %></td>
+                                    <td style="text-align: right;">LKR <%= item.getUnitPrice() %></td>
+                                    <td style="text-align: right;"><strong>LKR <%= item.getLineTotal() %></strong></td>
+                                </tr>
+                            <% } } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="max-width: 320px; margin-left: auto; margin-bottom: 28px;">
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+                        <span>Subtotal:</span>
+                        <strong>LKR <%= invoice.getSubtotal() %></strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+                        <span>Discount:</span>
+                        <strong>LKR <%= invoice.getDiscountAmount() %></strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+                        <span>Tax:</span>
+                        <strong>LKR <%= invoice.getTaxAmount() %></strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid var(--text-heading); font-size: 20px; font-weight: 800; color: var(--text-heading);">
+                        <span>Total Due:</span>
+                        <span style="color: var(--primary);">LKR <%= invoice.getTotalAmount() %></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                    <a href="${pageContext.request.contextPath}/cashier/invoices" class="btn btn-secondary" style="flex: 1;">Back to Invoices</a>
+                    <a href="${pageContext.request.contextPath}/cashier/payments?invoiceId=<%= invoice.getInvoiceId() %>" class="btn btn-primary" style="flex: 2;">
+                        Proceed to Process Payment →
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        DentalCare Clinic Management System
+    </footer>
 
 </body>
-
 </html>

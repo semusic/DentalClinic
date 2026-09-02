@@ -1,739 +1,206 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <%@ page import="com.dentalclinic.dto.PatientRecordDTO" %>
 <%@ page import="java.util.List" %>
 
 <%
-    PatientRecordDTO record =
-            (PatientRecordDTO)
-                    request.getAttribute("record");
-
-    List<PatientRecordDTO.ServiceRecord>
-            services =
-            record.getServices();
-
-    List<PatientRecordDTO.PaymentRecord>
-            payments =
-            record.getPayments();
+    PatientRecordDTO record = (PatientRecordDTO) request.getAttribute("record");
+    List<PatientRecordDTO.ServiceRecord> services = record != null ? record.getServices() : null;
+    List<PatientRecordDTO.PaymentRecord> payments = record != null ? record.getPayments() : null;
 %>
 
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        DentalCare | Patient Record
-    </title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f9fc;
-            color: #263238;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 35px auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 20px;
-
-            box-shadow:
-                0 8px 28px rgba(0,0,0,0.05);
-        }
-
-        .brand {
-            color: #1677a5;
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        h1 {
-            margin: 8px 0;
-            color: #183b56;
-        }
-
-        .muted {
-            color: #718096;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-
-            box-shadow:
-                0 8px 28px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #183b56;
-        }
-
-        .details {
-            display: grid;
-            grid-template-columns:
-                repeat(3, 1fr);
-            gap: 14px;
-        }
-
-        .detail {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .label {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 5px;
-        }
-
-        .value {
-            font-weight: 700;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 13px 8px;
-            border-bottom:
-                1px solid #edf2f7;
-            text-align: left;
-        }
-
-        th {
-            color: #718096;
-            font-size: 12px;
-        }
-
-        .right {
-            text-align: right;
-        }
-
-        .paid {
-            padding: 18px;
-            background: #edf9f2;
-            border-radius: 12px;
-            color: #18794e;
-        }
-
-        .paid-amount {
-            font-size: 25px;
-            font-weight: 700;
-            margin-top: 5px;
-        }
-
-        .medicine {
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 10px;
-        }
-
-        .notes {
-            white-space: pre-wrap;
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 17px;
-            line-height: 1.6;
-        }
-
-        .footer {
-            text-align: center;
-            color: #718096;
-            font-size: 12px;
-            padding: 15px;
-        }
-
-        @media (max-width: 700px) {
-
-            .details {
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-                padding: 12px;
-            }
-
-            .card,
-            .header {
-                padding: 20px;
-            }
-
-            table {
-                font-size: 13px;
-            }
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Patient Visit Record</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<main class="container">
-
-    <section class="header">
-
-        <div class="brand">
-            DentalCare
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
+                <span class="role-badge patient">Medical Record</span>
+            </a>
+            <div class="nav-actions">
+                <button onclick="window.print()" class="btn btn-secondary btn-sm">🖨️ Print Record</button>
+            </div>
         </div>
+    </header>
 
-        <h1>
-            Patient Visit Record
-        </h1>
+    <main class="main-container">
+        <% if (record == null) { %>
+            <div class="card" style="text-align: center; padding: 60px; color: var(--text-muted);">
+                <h2>Record Not Found</h2>
+                <p>The patient visit record could not be loaded or token is invalid.</p>
+            </div>
+        <% } else { %>
 
-        <div class="muted">
-
-            Secure record accessed from the patient's
-            clinic QR code.
-
-        </div>
-
-    </section>
-
-
-    <!-- PATIENT -->
-
-    <section class="card">
-
-        <h2>
-            Patient
-        </h2>
-
-        <div class="details">
-
-            <div class="detail">
-
-                <div class="label">
-                    Name
+            <div class="page-header" style="margin-bottom: 24px;">
+                <div class="page-title-group">
+                    <h1>Patient Visit Record</h1>
+                    <p>Verified digital clinic record accessed via patient QR code</p>
                 </div>
-
-                <div class="value">
-                    <%= record.getPatientName() %>
-                </div>
-
             </div>
 
-
-            <div class="detail">
-
-                <div class="label">
-                    Phone
+            <!-- Patient Details -->
+            <div class="card" style="margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    👤 Patient Information
+                </h2>
+                <div class="grid-3">
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Full Name</span>
+                        <strong style="font-size: 16px; color: var(--text-heading);"><%= record.getPatientName() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Phone</span>
+                        <strong style="font-size: 16px; color: var(--text-heading);"><%= record.getPatientPhone() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Email</span>
+                        <strong style="font-size: 16px; color: var(--text-heading);"><%= record.getPatientEmail() %></strong>
+                    </div>
                 </div>
-
-                <div class="value">
-                    <%= record.getPatientPhone() %>
-                </div>
-
             </div>
 
-
-            <div class="detail">
-
-                <div class="label">
-                    Email
+            <!-- Visit Details -->
+            <div class="card" style="margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    🩺 Visit Information
+                </h2>
+                <div class="grid-3">
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Visit ID</span>
+                        <strong>#<%= record.getVisitId() %></strong>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Appointment Date</span>
+                        <strong><%= record.getAppointmentDateTime() == null ? "N/A" : record.getAppointmentDateTime() %></strong>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Attending Doctor</span>
+                        <strong><%= record.getDoctorName() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Checked In</span>
+                        <strong><%= record.getCheckedInAt() == null ? "N/A" : record.getCheckedInAt() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Consultation Started</span>
+                        <strong><%= record.getConsultationStartedAt() == null ? "N/A" : record.getConsultationStartedAt() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Completed</span>
+                        <strong><%= record.getConsultationCompletedAt() == null ? "N/A" : record.getConsultationCompletedAt() %></strong>
+                    </div>
                 </div>
-
-                <div class="value">
-                    <%= record.getPatientEmail() %>
-                </div>
-
             </div>
 
-        </div>
-
-    </section>
-
-
-    <!-- VISIT -->
-
-    <section class="card">
-
-        <h2>
-            Visit Information
-        </h2>
-
-        <div class="details">
-
-            <div class="detail">
-
-                <div class="label">
-                    Visit ID
+            <!-- Services Performed -->
+            <div class="card" style="margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    🦷 Services Performed
+                </h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Quantity</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (services == null || services.isEmpty()) { %>
+                                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No services recorded for this visit.</td></tr>
+                            <% } else {
+                                for (PatientRecordDTO.ServiceRecord service : services) {
+                            %>
+                                <tr>
+                                    <td><strong><%= service.getServiceName() %></strong></td>
+                                    <td><%= service.getQuantity() %></td>
+                                    <td style="text-align: right;">LKR <%= service.getUnitPrice() %></td>
+                                    <td style="text-align: right;"><strong>LKR <%= service.getLineTotal() %></strong></td>
+                                </tr>
+                            <%  }
+                               }
+                            %>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="value">
-                    #<%= record.getVisitId() %>
-                </div>
-
             </div>
 
-
-            <div class="detail">
-
-                <div class="label">
-                    Appointment
+            <!-- Payment & Transactions -->
+            <div class="card" style="margin-bottom: 24px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    💳 Billing & Payment Summary
+                </h2>
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Invoice Number</span>
+                        <strong><%= record.getInvoiceNumber() == null ? "N/A" : record.getInvoiceNumber() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Invoice Total</span>
+                        <strong>LKR <%= record.getInvoiceTotal() %></strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted); display: block;">Total Paid</span>
+                        <strong style="color: #10b981; font-size: 18px;">LKR <%= record.getTotalPaid() %></strong>
+                    </div>
                 </div>
 
-                <div class="value">
-
-                    <%= record.getAppointmentDateTime()
-                            == null
-                            ? "Not available"
-                            : record
-                                .getAppointmentDateTime() %>
-
+                <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-muted);">Payment History</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (payments == null || payments.isEmpty()) { %>
+                                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No payment records found.</td></tr>
+                            <% } else {
+                                for (PatientRecordDTO.PaymentRecord payment : payments) {
+                            %>
+                                <tr>
+                                    <td><%= payment.getPaymentReference() %></td>
+                                    <td><span class="badge badge-info"><%= payment.getPaymentMethod() %></span></td>
+                                    <td>LKR <%= payment.getAmount() %></td>
+                                    <td><%= payment.getTransactionDate() %></td>
+                                </tr>
+                            <%  }
+                               }
+                            %>
+                        </tbody>
+                    </table>
                 </div>
-
             </div>
 
-
-            <div class="detail">
-
-                <div class="label">
-                    Doctor
+            <!-- Notes -->
+            <div class="card">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    📝 Clinical Notes
+                </h2>
+                <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); font-size: 14px; line-height: 1.6;">
+                    <%= record.getVisitNotes() == null || record.getVisitNotes().isBlank() ? "No additional clinical notes recorded." : record.getVisitNotes() %>
                 </div>
-
-                <div class="value">
-                    <%= record.getDoctorName() %>
-                </div>
-
             </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Checked In
-                </div>
-
-                <div class="value">
-
-                    <%= record.getCheckedInAt()
-                            == null
-                            ? "Not recorded"
-                            : record.getCheckedInAt() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Consultation Started
-                </div>
-
-                <div class="value">
-
-                    <%= record
-                            .getConsultationStartedAt()
-                            == null
-                            ? "Not recorded"
-                            : record
-                                .getConsultationStartedAt() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Consultation Completed
-                </div>
-
-                <div class="value">
-
-                    <%= record
-                            .getConsultationCompletedAt()
-                            == null
-                            ? "Not recorded"
-                            : record
-                                .getConsultationCompletedAt() %>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- SERVICES -->
-
-    <section class="card">
-
-        <h2>
-            Services Performed
-        </h2>
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Service
-                    </th>
-
-                    <th>
-                        Quantity
-                    </th>
-
-                    <th class="right">
-                        Unit Price
-                    </th>
-
-                    <th class="right">
-                        Total
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            <%
-                if (services == null
-                        || services.isEmpty()) {
-            %>
-
-                <tr>
-
-                    <td colspan="4">
-                        No services recorded.
-                    </td>
-
-                </tr>
-
-            <%
-                } else {
-
-                    for (
-                        PatientRecordDTO.ServiceRecord
-                                service :
-                        services
-                    ) {
-            %>
-
-                <tr>
-
-                    <td>
-                        <%= service.getServiceName() %>
-                    </td>
-
-                    <td>
-                        <%= service.getQuantity() %>
-                    </td>
-
-                    <td class="right">
-
-                        LKR
-                        <%= service.getUnitPrice() %>
-
-                    </td>
-
-                    <td class="right">
-
-                        LKR
-                        <%= service.getLineTotal() %>
-
-                    </td>
-
-                </tr>
-
-            <%
-                    }
-                }
-            %>
-
-            </tbody>
-
-        </table>
-
-    </section>
-
-
-    <!-- PAYMENT -->
-
-    <section class="card">
-
-        <h2>
-            Payment
-        </h2>
-
-
-        <div class="details">
-
-            <div class="detail">
-
-                <div class="label">
-                    Invoice
-                </div>
-
-                <div class="value">
-
-                    <%= record.getInvoiceNumber() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Invoice Total
-                </div>
-
-                <div class="value">
-
-                    LKR
-                    <%= record.getInvoiceTotal() %>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="label">
-                    Receipt
-                </div>
-
-                <div class="value">
-
-                    <%= record.getLatestReceiptNumber()
-                            == null
-                            ? "Not available"
-                            : record
-                                .getLatestReceiptNumber() %>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <br>
-
-
-        <div class="paid">
-
-            <div>
-                TOTAL PAID
-            </div>
-
-            <div class="paid-amount">
-
-                LKR
-                <%= record.getTotalPaid() %>
-
-            </div>
-
-        </div>
-
-
-        <br>
-
-
-        <h3>
-            Payment Transactions
-        </h3>
-
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Reference
-                    </th>
-
-                    <th>
-                        Method
-                    </th>
-
-                    <th>
-                        Amount
-                    </th>
-
-                    <th>
-                        Date
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            <%
-                if (payments == null
-                        || payments.isEmpty()) {
-            %>
-
-                <tr>
-
-                    <td colspan="4">
-                        No payment transactions found.
-                    </td>
-
-                </tr>
-
-            <%
-                } else {
-
-                    for (
-                        PatientRecordDTO.PaymentRecord
-                                payment :
-                        payments
-                    ) {
-            %>
-
-                <tr>
-
-                    <td>
-
-                        <%= payment
-                                .getPaymentReference() %>
-
-                    </td>
-
-                    <td>
-
-                        <%= payment
-                                .getPaymentMethod() %>
-
-                    </td>
-
-                    <td>
-
-                        LKR
-                        <%= payment.getAmount() %>
-
-                    </td>
-
-                    <td>
-
-                        <%= payment
-                                .getTransactionDate() %>
-
-                    </td>
-
-                </tr>
-
-            <%
-                    }
-                }
-            %>
-
-            </tbody>
-
-        </table>
-
-    </section>
-
-
-    <!-- MEDICINE -->
-
-    <section class="card">
-
-        <h2>
-            Medicine
-        </h2>
-
-        <div class="medicine">
-
-            Medicine prescribed:
-
-            <strong>
-
-                <%= record.isMedicinePrescribed()
-                        ? "Yes"
-                        : "No" %>
-
-            </strong>
-
-            <p>
-
-                Medicine names and dosages are not
-                recorded in the system. The doctor provides
-                the medication instructions directly to
-                the patient.
-
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <!-- NOTES / FOLLOW-UP -->
-
-    <section class="card">
-
-        <h2>
-            Clinical / Follow-up Notes
-        </h2>
-
-        <div class="notes">
-
-            <%= record.getVisitNotes()
-                    == null
-                    || record.getVisitNotes().isBlank()
-                    ? "No follow-up or clinical notes recorded."
-                    : record.getVisitNotes() %>
-
-        </div>
-
-    </section>
-
-
-    <div class="footer">
-
-        DentalCare • Patient record generated from
-        the clinic QR system.
-
-    </div>
-
-</main>
+        <% } %>
+    </main>
+
+    <footer class="app-footer">
+        DentalCare Clinic Management System • Official Record
+    </footer>
 
 </body>
-
 </html>

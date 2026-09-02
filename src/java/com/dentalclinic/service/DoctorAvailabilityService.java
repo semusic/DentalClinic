@@ -9,14 +9,9 @@ import java.util.List;
 
 public interface DoctorAvailabilityService {
 
-    List<DoctorSchedule> getSchedules(
-            int doctorId,
-            LocalDate date
-    ) throws SQLException;
+    List<DoctorSchedule> getSchedules(int doctorId, LocalDate date) throws SQLException;
 
-    boolean isWithinWorkingHours(
-            int doctorId,
-            LocalDate date,
-            LocalTime time
-    ) throws SQLException;
+    boolean isWithinWorkingHours(int doctorId, LocalDate date, LocalTime time) throws SQLException;
+
+    boolean isWithinWorkingHours(int doctorId, LocalDate date, LocalTime time, int durationMinutes) throws SQLException;
 }

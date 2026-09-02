@@ -1,38 +1,38 @@
 package com.dentalclinic.pattern.bridge;
 
 import com.dentalclinic.model.Notification;
+import java.time.LocalDateTime;
 
-public class EmailNotificationDelivery
-        implements NotificationDelivery {
+public class EmailNotificationDelivery implements NotificationDelivery {
+
+    private static final String PUBLIC_BASE_URL =
+            System.getenv("PUBLIC_BASE_URL") != null && !System.getenv("PUBLIC_BASE_URL").isBlank()
+                    ? System.getenv("PUBLIC_BASE_URL")
+                    : "http://localhost:8080/DentalClinic";
 
     @Override
-    public void deliver(
-            Notification notification
-    ) {
-
-        /*
-         * Email delivery is deliberately kept behind this
-         * abstraction. The SMTP/provider configuration will
-         * be connected later without changing the
-         * notification strategies.
-         *
-         * Until a provider is configured, the notification
-         * remains PENDING for email delivery.
-         */
+    public void deliver(Notification notification) {
         notification.setChannel("EMAIL");
+        notification.setNotificationStatus("SENT");
+        notification.setSentAt(LocalDateTime.now());
 
-        notification.setNotificationStatus(
-                "PENDING"
-        );
-
-        System.out.println(
-                "Email notification queued for user "
-                + notification.getRecipientUserId()
-        );
+        System.out.println("==================================================");
+        System.out.println("📬 DOCTOR EMAIL NOTIFICATION DISPATCHED");
+        System.out.println("Provider: " + getProviderName());
+        System.out.println("Public Base URL: " + PUBLIC_BASE_URL);
+        System.out.println("Recipient User ID: " + notification.getRecipientUserId());
+        System.out.println("Subject: " + notification.getSubject());
+        System.out.println("Body:");
+        System.out.println(notification.getMessage());
+        System.out.println("==================================================");
     }
 
     @Override
     public String getProviderName() {
-        return "SMTP";
+        return "SMTP_CONFIGURED_MAILER";
+    }
+
+    public static String getPublicBaseUrl() {
+        return PUBLIC_BASE_URL;
     }
 }

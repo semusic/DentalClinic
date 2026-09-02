@@ -61,7 +61,7 @@ public class PatientRecordServlet
             );
 
             request.getRequestDispatcher(
-                    "/patient-record.jsp"
+                    "/patient/patient-record.jsp"
             ).forward(
                     request,
                     response

@@ -96,6 +96,52 @@ public class AppointmentReviewServiceImpl
                         assistantUserId
                 );
 
+        try {
+            Optional<AppointmentReviewDTO> reviewOpt = reviewDAO.findReviewById(appointmentId);
+            if (reviewOpt.isPresent()) {
+                AppointmentReviewDTO review = reviewOpt.get();
+                String publicBaseUrl = com.dentalclinic.pattern.bridge.EmailNotificationDelivery.getPublicBaseUrl();
+                String approvalUrl = publicBaseUrl + "/doctor/approval?token=" + java.net.URLEncoder.encode(token.getRawToken(), java.nio.charset.StandardCharsets.UTF_8);
+
+                com.dentalclinic.model.Notification notification = new com.dentalclinic.model.Notification();
+                // Assign to system / assistant or doctor user
+                notification.setRecipientUserId(assistantUserId);
+                notification.setAppointmentId(appointmentId);
+                notification.setNotificationType("DOCTOR_APPROVAL_REQUEST");
+                notification.setChannel("EMAIL");
+                notification.setSubject("DentalCare Approval Request: " + review.getServiceName() + " (" + review.getRequestedDate() + ")");
+
+                String emailBody = String.format(
+                        "Dear Dr. %s %s,\n\n" +
+                        "A new patient appointment requires your clinical review and approval.\n\n" +
+                        "Patient Name: %s\n" +
+                        "Requested Service: %s\n" +
+                        "Date: %s\n" +
+                        "Time Slot: %s\n" +
+                        "Symptoms / Notes: %s\n\n" +
+                        "Please click the secure link below to review and approve/reject this request:\n" +
+                        "%s\n\n" +
+                        "Security Notice: This link is temporary, single-use, and valid for 24 hours.\n\n" +
+                        "DentalCare Clinic Management System",
+                        review.getDoctorFirstName() != null ? review.getDoctorFirstName() : "",
+                        review.getDoctorLastName() != null ? review.getDoctorLastName() : "",
+                        review.getPatientFirstName() + " " + review.getPatientLastName(),
+                        review.getServiceName(),
+                        review.getRequestedDate(),
+                        review.getRequestedTime() != null ? review.getRequestedTime().toString() : "Flexible",
+                        review.getPatientReason() != null ? review.getPatientReason() : "None provided",
+                        approvalUrl
+                );
+
+                notification.setMessage(emailBody);
+
+                com.dentalclinic.service.NotificationService notificationService = new com.dentalclinic.service.impl.NotificationServiceImpl();
+                notificationService.send(notification);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to dispatch doctor email notification: " + e.getMessage());
+        }
+
         return token.getRawToken();
     }
 

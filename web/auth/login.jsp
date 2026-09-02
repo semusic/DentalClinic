@@ -1,178 +1,71 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DentalCare | Login</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(
-                135deg,
-                #e8f8ff,
-                #f7fbff
-            );
-        }
-
-        .login-container {
-            width: 420px;
-            background: white;
-            padding: 42px;
-            border-radius: 18px;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.12);
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .brand h1 {
-            margin: 0;
-            font-size: 30px;
-            color: #1677a5;
-        }
-
-        .brand p {
-            margin-top: 8px;
-            color: #718096;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px 14px;
-            border: 1px solid #dbe4ec;
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #1677a5;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: #1677a5;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.92;
-        }
-
-        .error {
-            margin-bottom: 18px;
-            padding: 12px;
-            border-radius: 8px;
-            background: #fff0f0;
-            color: #b42318;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Sign In</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
+<body style="align-items: center; justify-content: center; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); min-height: 100vh;">
 
-<body>
-
-<div class="login-container">
-
-    <div class="brand">
-        <h1>DentalCare</h1>
-        <p>Clinic Management Portal</p>
-    </div>
-
-    <%
-        String error =
-                (String) request.getAttribute("error");
-
-        if (error != null) {
-    %>
-
-    <div class="error">
-        <%= error %>
-    </div>
-
-    <%
-        }
-    %>
-
-    <form action="${pageContext.request.contextPath}/login"
-          method="post">
-
-        <div class="form-group">
-            <label for="username">
-                Username
-            </label>
-
-            <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    maxlength="50"
-                    required
-                    autocomplete="username">
+    <div class="card" style="width: 100%; max-width: 440px; padding: 40px; box-shadow: var(--shadow-lg);">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div class="brand-icon" style="margin: 0 auto 16px; width: 52px; height: 52px; font-size: 26px;">
+                🦷
+            </div>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--text-heading);">DentalCare</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Clinic Management & Patient Portal</p>
         </div>
 
-        <div class="form-group">
-            <label for="password">
-                Password
-            </label>
+        <%
+            String error = (String) request.getAttribute("error");
+            if (error != null) {
+        %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <%
+            }
 
-            <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    autocomplete="current-password">
+            String registered = request.getParameter("registered");
+            if ("true".equals(registered)) {
+        %>
+            <div class="alert alert-success">
+                Account created successfully! Please sign in with your username and password.
+            </div>
+        <%
+            }
+        %>
+
+        <form action="${pageContext.request.contextPath}/login" method="post">
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-control" type="text" id="username" name="username" maxlength="50" required autocomplete="username" placeholder="Enter your username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control" type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 15px; margin-top: 8px;">
+                Sign In to Portal
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 14px;">
+            <p style="color: var(--text-muted);">
+                Don't have a patient account?
+                <a href="${pageContext.request.contextPath}/register" style="color: var(--primary); font-weight: 700; text-decoration: none;">Create one here</a>
+            </p>
+            <p style="margin-top: 12px;">
+                <a href="${pageContext.request.contextPath}/services" style="color: var(--text-muted); font-size: 13px; text-decoration: none;">
+                    Explore Services & Pricing →
+                </a>
+            </p>
         </div>
-
-        <button type="submit">
-            Sign In
-        </button>
-
-    </form>
-
-          
-          <div style="text-align:center; margin-top:20px;">
-    <span style="color:#718096;">
-        Don't have an account?
-    </span>
-
-    <a
-        href="${pageContext.request.contextPath}/register"
-        style="color:#1677a5; font-weight:600;">
-        Create one
-    </a>
-</div>
-        
-</div>
+    </div>
 
 </body>
 </html>

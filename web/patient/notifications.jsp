@@ -3,267 +3,95 @@
 <%@ page import="com.dentalclinic.model.Notification" %>
 
 <%
-    List<Notification> notifications =
-            (List<Notification>)
-                    request.getAttribute(
-                            "notifications"
-                    );
+    List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 %>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        DentalCare | Notifications
-    </title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f9fc;
-            color: #263238;
-        }
-
-        .header {
-            background: white;
-            padding: 20px 40px;
-            border-bottom: 1px solid #e5e7eb;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand {
-            color: #1677a5;
-            font-size: 25px;
-            font-weight: 700;
-        }
-
-        .back {
-            text-decoration: none;
-            color: #1677a5;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        h1 {
-            color: #183b56;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #718096;
-            margin-bottom: 28px;
-        }
-
-        .notification {
-            background: white;
-            padding: 22px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-
-            box-shadow:
-                0 7px 25px rgba(0, 0, 0, 0.05);
-
-            border: 1px solid #edf2f7;
-        }
-
-        .notification.unread {
-            border-left: 4px solid #1677a5;
-        }
-
-        .top {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .subject {
-            font-size: 18px;
-            font-weight: 700;
-            color: #183b56;
-        }
-
-        .type {
-            font-size: 12px;
-            padding: 6px 10px;
-            border-radius: 15px;
-            background: #eaf4fb;
-            color: #1677a5;
-            font-weight: 700;
-        }
-
-        .message {
-            margin-top: 12px;
-            color: #4a5568;
-            line-height: 1.7;
-        }
-
-        .meta {
-            margin-top: 15px;
-            color: #718096;
-            font-size: 12px;
-        }
-
-        .empty {
-            background: white;
-            padding: 55px 30px;
-            border-radius: 16px;
-            text-align: center;
-            color: #718096;
-        }
-
-        @media (max-width: 650px) {
-
-            .top {
-                flex-direction: column;
-            }
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Notifications</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<header class="header">
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
+                <span class="role-badge patient">Patient</span>
+            </a>
 
-    <div class="brand">
-        DentalCare
-    </div>
+            <div class="nav-menu">
+                <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-link">Dashboard</a>
+                <a href="${pageContext.request.contextPath}/patient/appointments/request" class="nav-link">Book Appointment</a>
+                <a href="${pageContext.request.contextPath}/patient/notifications" class="nav-link active">Notifications</a>
+                <a href="${pageContext.request.contextPath}/services" class="nav-link">Services</a>
+            </div>
 
-    <a
-        class="back"
-        href="${pageContext.request.contextPath}/patient/dashboard">
+            <div class="nav-actions">
+                <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
+            </div>
+        </div>
+    </header>
 
-        Dashboard
-
-    </a>
-
-</header>
-
-
-<main class="container">
-
-    <h1>
-        Notifications
-    </h1>
-
-    <p class="subtitle">
-        Appointment updates and important messages
-        from DentalCare.
-    </p>
-
-
-    <%
-        if (notifications == null
-                || notifications.isEmpty()) {
-    %>
-
-        <div class="empty">
-
-            <h2>
-                No notifications
-            </h2>
-
-            <p>
-                You currently have no notifications.
-            </p>
-
+    <main class="main-container">
+        <div class="page-header">
+            <div class="page-title-group">
+                <h1>Notification Inbox</h1>
+                <p>Track updates regarding your appointment requests and clinic notifications.</p>
+            </div>
         </div>
 
-    <%
-        } else {
-
-            for (Notification notification :
-                    notifications) {
-
-                boolean unread =
-                        notification.getReadAt() == null;
-    %>
-
-        <article
-            class="notification <%= unread
-                    ? "unread"
-                    : "" %>">
-
-            <div class="top">
-
-                <div class="subject">
-
-                    <%= notification.getSubject() == null
-                            ? "DentalCare Notification"
-                            : notification.getSubject() %>
-
+        <%
+            if (notifications == null || notifications.isEmpty()) {
+        %>
+            <div class="card" style="text-align: center; padding: 60px; color: var(--text-muted);">
+                <div style="font-size: 40px; margin-bottom: 12px;">🔔</div>
+                <h3>No Notifications Available</h3>
+                <p style="margin-top: 8px;">You currently have no new notifications or appointment alerts.</p>
+            </div>
+        <%
+            } else {
+                for (Notification notification : notifications) {
+                    boolean unread = notification.getReadAt() == null;
+        %>
+            <div class="card" style="margin-bottom: 16px; border-left: 4px solid <%= unread ? "var(--primary)" : "var(--border-color)" %>;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 12px;">
+                    <div>
+                        <h3 style="font-size: 17px; font-weight: 700; color: var(--text-heading);">
+                            <%= notification.getSubject() == null ? "DentalCare Notification" : notification.getSubject() %>
+                        </h3>
+                    </div>
+                    <span class="badge badge-info">
+                        <%= notification.getNotificationType() %>
+                    </span>
                 </div>
 
-                <div class="type">
-
-                    <%= notification.getNotificationType() %>
-
+                <div style="color: var(--text-body); font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
+                    <%= notification.getMessage() %>
                 </div>
 
+                <div style="display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 10px;">
+                    <% if (notification.getAppointmentId() != null) { %>
+                        <span><strong>Appointment ID:</strong> #<%= notification.getAppointmentId() %></span>
+                    <% } %>
+                    <span><strong>Date:</strong> <%= notification.getCreatedAt() %></span>
+                    <span><strong>Status:</strong> <%= notification.getNotificationStatus() %></span>
+                </div>
             </div>
-
-
-            <div class="message">
-
-                <%= notification.getMessage() %>
-
-            </div>
-
-
-            <div class="meta">
-
-                <%
-                    if (notification.getAppointmentId()
-                            != null) {
-                %>
-
-                    Appointment #
-                    <%= notification.getAppointmentId() %>
-                    &nbsp; • &nbsp;
-
-                <%
-                    }
-                %>
-
-                <%= notification.getCreatedAt() %>
-
-                &nbsp; • &nbsp;
-
-                <%= notification.getNotificationStatus() %>
-
-            </div>
-
-        </article>
-
-    <%
+        <%
+                }
             }
-        }
-    %>
+        %>
+    </main>
 
-</main>
+    <footer class="app-footer">
+        DentalCare Clinic Management System
+    </footer>
 
 </body>
-
 </html>

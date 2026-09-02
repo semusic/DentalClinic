@@ -1,351 +1,145 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <title>
-        DentalCare | Patient Registration
-    </title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background:
-                linear-gradient(
-                    135deg,
-                    #e8f8ff,
-                    #f7fbff
-                );
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: auto;
-            background: white;
-            padding: 40px;
-            border-radius: 18px;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.10);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            margin: 0;
-            color: #1677a5;
-        }
-
-        .header p {
-            color: #718096;
-        }
-
-        .section-title {
-            margin-top: 30px;
-            margin-bottom: 18px;
-            color: #2d3748;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 8px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns:
-                repeat(2, 1fr);
-            gap: 18px;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 7px;
-            color: #2d3748;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #dbe4ec;
-            border-radius: 9px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #1677a5;
-        }
-
-        .error {
-            background: #fff1f1;
-            color: #b42318;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .actions {
-            margin-top: 30px;
-            display: flex;
-            gap: 12px;
-        }
-
-        button,
-        .back-link {
-            flex: 1;
-            padding: 14px;
-            border-radius: 9px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        button {
-            border: none;
-            background: #1677a5;
-            color: white;
-            cursor: pointer;
-        }
-
-        .back-link {
-            border: 1px solid #dbe4ec;
-            color: #2d3748;
-            background: white;
-        }
-
-        @media (max-width: 650px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .full {
-                grid-column: auto;
-            }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Patient Registration</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<div class="container">
-
-    <div class="header">
-        <h1>DentalCare</h1>
-        <p>Create your patient account</p>
-    </div>
-
-    <%
-        String error =
-                (String) request.getAttribute("error");
-
-        if (error != null) {
-    %>
-
-    <div class="error">
-        <%= error %>
-    </div>
-
-    <%
-        }
-    %>
-
-    <form
-        action="${pageContext.request.contextPath}/register"
-        method="post">
-
-        <h3 class="section-title">
-            Account Information
-        </h3>
-
-        <div class="grid">
-
-            <div class="field">
-                <label>Username</label>
-                <input
-                    type="text"
-                    name="username"
-                    maxlength="50"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    maxlength="150"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    minlength="8"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Confirm Password</label>
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    minlength="8"
-                    required>
-            </div>
-
-        </div>
-
-
-        <h3 class="section-title">
-            Personal Information
-        </h3>
-
-        <div class="grid">
-
-            <div class="field">
-                <label>First Name</label>
-                <input
-                    type="text"
-                    name="firstName"
-                    maxlength="100"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Last Name</label>
-                <input
-                    type="text"
-                    name="lastName"
-                    maxlength="100"
-                    required>
-            </div>
-
-            <div class="field">
-                <label>Phone</label>
-                <input
-                    type="tel"
-                    name="phone"
-                    maxlength="20">
-            </div>
-
-            <div class="field">
-                <label>Date of Birth</label>
-                <input
-                    type="date"
-                    name="dateOfBirth">
-            </div>
-
-            <div class="field">
-                <label>Gender</label>
-                <select name="gender">
-                    <option value="">Select</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                    <option value="Other">Other</option>
-                    <option value="Prefer not to say">
-                        Prefer not to say
-                    </option>
-                </select>
-            </div>
-
-            <div class="field full">
-                <label>Address</label>
-                <input
-                    type="text"
-                    name="address"
-                    maxlength="255">
-            </div>
-
-        </div>
-
-
-        <h3 class="section-title">
-            Emergency Contact
-        </h3>
-
-        <div class="grid">
-
-            <div class="field">
-                <label>Contact Name</label>
-                <input
-                    type="text"
-                    name="emergencyContactName"
-                    maxlength="150">
-            </div>
-
-            <div class="field">
-                <label>Contact Phone</label>
-                <input
-                    type="tel"
-                    name="emergencyContactPhone"
-                    maxlength="20">
-            </div>
-
-        </div>
-
-
-        <h3 class="section-title">
-            Additional Information
-        </h3>
-
-        <div class="field">
-            <label>Medical Notes</label>
-
-            <textarea
-                name="medicalNotes"
-                maxlength="2000"
-                placeholder="Optional information to help the clinic prepare for your visit.">
-            </textarea>
-        </div>
-
-
-        <div class="actions">
-
-            <a
-                class="back-link"
-                href="${pageContext.request.contextPath}/login">
-                Back to Login
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="${pageContext.request.contextPath}/login" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
             </a>
-
-            <button type="submit">
-                Create Patient Account
-            </button>
-
+            <div class="nav-actions">
+                <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary btn-sm">Back to Sign In</a>
+            </div>
         </div>
+    </header>
 
-    </form>
+    <main class="main-container">
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <div style="margin-bottom: 24px; text-align: center;">
+                <h1 style="font-size: 26px; font-weight: 800; color: var(--text-heading);">Patient Account Registration</h1>
+                <p style="color: var(--text-muted);">Create your account to request appointments and access medical records</p>
+            </div>
 
-</div>
+            <%
+                String error = (String) request.getAttribute("error");
+                if (error != null) {
+            %>
+                <div class="alert alert-error">
+                    <%= error %>
+                </div>
+            <%
+                }
+            %>
+
+            <form action="${pageContext.request.contextPath}/register" method="post">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    Account Credentials
+                </h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" type="text" name="username" maxlength="50" required placeholder="Choose a username">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input class="form-control" type="email" name="email" maxlength="150" required placeholder="name@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input class="form-control" type="password" name="password" minlength="8" required placeholder="At least 8 characters">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input class="form-control" type="password" name="confirmPassword" minlength="8" required placeholder="Re-enter password">
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 16px; margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    Personal Information
+                </h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input class="form-control" type="text" name="firstName" maxlength="100" required placeholder="First name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-control" type="text" name="lastName" maxlength="100" required placeholder="Last name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input class="form-control" type="tel" name="phone" maxlength="20" placeholder="+94 77 123 4567">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input class="form-control" type="date" name="dateOfBirth">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select class="form-control" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input class="form-control" type="text" name="address" maxlength="255" placeholder="Residential address">
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 16px; margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    Emergency Contact
+                </h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Contact Person Name</label>
+                        <input class="form-control" type="text" name="emergencyContactName" maxlength="150" placeholder="Relative or guardian">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Phone</label>
+                        <input class="form-control" type="tel" name="emergencyContactPhone" maxlength="20" placeholder="Emergency contact number">
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 16px; margin-bottom: 16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px;">
+                    Medical History Notes
+                </h3>
+                <div class="form-group">
+                    <label class="form-label">Medical & Health Notes (Optional)</label>
+                    <textarea class="form-control" name="medicalNotes" maxlength="2000" rows="3" placeholder="Disclose allergies, medical conditions, or special requirements..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                    <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">Complete Registration</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        DentalCare Clinic Management System
+    </footer>
 
 </body>
 </html>

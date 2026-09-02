@@ -19,6 +19,10 @@ public interface AppointmentDAO {
             int appointmentId
     ) throws SQLException;
 
+    Optional<Appointment> findByAppointmentNumber(
+            String appointmentNumber
+    ) throws SQLException;
+
     Optional<Appointment> findByVisitId(
             int visitId
     ) throws SQLException;

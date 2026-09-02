@@ -5,402 +5,138 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        DentalCare | Request Appointment
-    </title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f9fc;
-            color: #263238;
-        }
-
-        .header {
-            background: white;
-            padding: 22px 45px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .brand {
-            color: #1677a5;
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 35px;
-            border-radius: 18px;
-            box-shadow:
-                0 12px 35px rgba(0,0,0,0.07);
-        }
-
-        h1 {
-            margin-top: 0;
-            color: #183b56;
-        }
-
-        .subtitle {
-            color: #718096;
-            margin-bottom: 30px;
-        }
-
-        .field {
-            margin-bottom: 22px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        select,
-        input,
-        textarea {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #dbe4ec;
-            border-radius: 9px;
-            font: inherit;
-        }
-
-        select:focus,
-        input:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #1677a5;
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .error {
-            background: #fff0f0;
-            color: #b42318;
-            padding: 13px;
-            border-radius: 9px;
-            margin-bottom: 20px;
-        }
-
-        .hint {
-            margin-top: 7px;
-            font-size: 13px;
-            color: #718096;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        button,
-        .back {
-            flex: 1;
-            padding: 14px;
-            border-radius: 9px;
-            font-weight: 700;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        button {
-            border: none;
-            background: #1677a5;
-            color: white;
-            cursor: pointer;
-        }
-
-        .back {
-            border: 1px solid #dbe4ec;
-            color: #374151;
-            background: white;
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Request Appointment</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<header class="header">
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
+                <span class="role-badge patient">Patient</span>
+            </a>
 
-    <div class="brand">
-        DentalCare
-    </div>
+            <div class="nav-menu">
+                <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-link">Dashboard</a>
+                <a href="${pageContext.request.contextPath}/patient/appointments/request" class="nav-link active">Book Appointment</a>
+                <a href="${pageContext.request.contextPath}/patient/notifications" class="nav-link">Notifications</a>
+                <a href="${pageContext.request.contextPath}/services" class="nav-link">Services</a>
+            </div>
 
-</header>
-
-
-<div class="container">
-
-    <div class="card">
-
-        <h1>
-            Request an Appointment
-        </h1>
-
-        <p class="subtitle">
-            Choose your preferred service, doctor,
-            date and time. Your request must be
-            reviewed before the appointment is confirmed.
-        </p>
-
-        <%
-            String error =
-                    (String) request.getAttribute("error");
-
-            if (error != null) {
-        %>
-
-        <div class="error">
-            <%= error %>
+            <div class="nav-actions">
+                <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
+            </div>
         </div>
+    </header>
 
-        <%
+    <main class="main-container">
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <div class="page-header" style="margin-bottom: 24px;">
+                <div class="page-title-group">
+                    <h1>Request an Appointment</h1>
+                    <p>Select your service, doctor, and preferred time slot. Requests are subject to doctor approval.</p>
+                </div>
+            </div>
+
+            <%
+                String error = (String) request.getAttribute("error");
+                if (error != null) {
+            %>
+                <div class="alert alert-error">
+                    <%= error %>
+                </div>
+            <%
+                }
+
+                List<Service> services = (List<Service>) request.getAttribute("services");
+                List<Doctor> doctors = (List<Doctor>) request.getAttribute("doctors");
+                Integer selectedServiceId = (Integer) request.getAttribute("selectedServiceId");
+            %>
+
+            <form action="${pageContext.request.contextPath}/patient/appointments/request" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="serviceId">Dental Service</label>
+                    <select class="form-control" id="serviceId" name="serviceId" required onchange="loadDoctors(this.value)">
+                        <option value="">-- Select a Service --</option>
+                        <%
+                            if (services != null) {
+                                for (Service service : services) {
+                                    boolean selected = selectedServiceId != null && selectedServiceId.equals(service.getServiceId());
+                        %>
+                            <option value="<%= service.getServiceId() %>" <%= selected ? "selected" : "" %>>
+                                <%= service.getServiceName() %> — LKR <%= service.getStandardPrice() %>
+                            </option>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="doctorId">Preferred Doctor</label>
+                    <select class="form-control" id="doctorId" name="doctorId" required>
+                        <option value="">-- Select a Service First --</option>
+                        <%
+                            if (doctors != null && !doctors.isEmpty()) {
+                                for (Doctor doctor : doctors) {
+                        %>
+                            <option value="<%= doctor.getDoctorId() %>">
+                                Dr. <%= doctor.getFullName() %> (<%= doctor.getSpecialization() %>)
+                            </option>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                    <div class="form-hint">Only doctors qualified for the selected service are displayed.</div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="requestedDate">Preferred Date</label>
+                        <input class="form-control" type="date" id="requestedDate" name="requestedDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="requestedTime">Preferred Time</label>
+                        <input class="form-control" type="time" id="requestedTime" name="requestedTime" required>
+                        <div class="form-hint">The doctor's schedule and availability will be checked.</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="patientReason">Reason for Visit</label>
+                    <textarea class="form-control" id="patientReason" name="patientReason" maxlength="2000" rows="3" placeholder="Briefly describe your symptoms or reason for appointment..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                    <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        DentalCare Clinic Management System
+    </footer>
+
+    <script>
+        function loadDoctors(serviceId) {
+            if (!serviceId) {
+                window.location = '${pageContext.request.contextPath}/patient/appointments/request';
+                return;
             }
-
-            List<Service> services =
-                    (List<Service>)
-                            request.getAttribute(
-                                    "services"
-                            );
-
-            List<Doctor> doctors =
-                    (List<Doctor>)
-                            request.getAttribute(
-                                    "doctors"
-                            );
-
-            Integer selectedServiceId =
-                    (Integer)
-                            request.getAttribute(
-                                    "selectedServiceId"
-                            );
-        %>
-
-
-        <form
-            action="${pageContext.request.contextPath}/patient/appointments/request"
-            method="post">
-
-            <div class="field">
-
-                <label for="serviceId">
-                    Dental Service
-                </label>
-
-                <select
-                    id="serviceId"
-                    name="serviceId"
-                    required
-                    onchange="loadDoctors(this.value)">
-
-                    <option value="">
-                        Select a service
-                    </option>
-
-                    <%
-                        if (services != null) {
-
-                            for (Service service :
-                                    services) {
-
-                                boolean selected =
-                                        selectedServiceId != null
-                                        && selectedServiceId
-                                            .equals(
-                                                service.getServiceId()
-                                            );
-                    %>
-
-                    <option
-                        value="<%= service.getServiceId() %>"
-                        <%= selected
-                                ? "selected"
-                                : "" %>>
-
-                        <%= service.getServiceName() %>
-                        -
-                        LKR <%= service.getStandardPrice() %>
-
-                    </option>
-
-                    <%
-                            }
-                        }
-                    %>
-
-                </select>
-
-            </div>
-
-
-            <div class="field">
-
-                <label for="doctorId">
-                    Preferred Doctor
-                </label>
-
-                <select
-                    id="doctorId"
-                    name="doctorId"
-                    required>
-
-                    <option value="">
-                        Select a service first
-                    </option>
-
-                    <%
-                        if (doctors != null
-                                && !doctors.isEmpty()) {
-
-                            for (Doctor doctor :
-                                    doctors) {
-                    %>
-
-                    <option
-                        value="<%= doctor.getDoctorId() %>">
-
-                        Dr. <%= doctor.getFullName() %>
-                        -
-                        <%= doctor.getSpecialization() %>
-
-                    </option>
-
-                    <%
-                            }
-                        }
-                    %>
-
-                </select>
-
-                <div class="hint">
-                    Only doctors assigned to the selected
-                    service are displayed.
-                </div>
-
-            </div>
-
-
-            <div class="field">
-
-                <label for="requestedDate">
-                    Preferred Date
-                </label>
-
-                <input
-                    type="date"
-                    id="requestedDate"
-                    name="requestedDate"
-                    required>
-
-            </div>
-
-
-            <div class="field">
-
-                <label for="requestedTime">
-                    Preferred Time
-                </label>
-
-                <input
-                    type="time"
-                    id="requestedTime"
-                    name="requestedTime"
-                    required>
-
-                <div class="hint">
-                    The system will verify the doctor's
-                    working schedule and appointment conflicts.
-                </div>
-
-            </div>
-
-
-            <div class="field">
-
-                <label for="patientReason">
-                    Reason for Visit
-                </label>
-
-                <textarea
-                    id="patientReason"
-                    name="patientReason"
-                    maxlength="2000"
-                    placeholder="Briefly describe why you would like an appointment."></textarea>
-
-            </div>
-
-
-            <div class="actions">
-
-                <a
-                    class="back"
-                    href="${pageContext.request.contextPath}/patient/dashboard">
-
-                    Cancel
-
-                </a>
-
-                <button type="submit">
-                    Submit Appointment Request
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-
-<script>
-
-    function loadDoctors(serviceId) {
-
-        if (!serviceId) {
-
-            window.location =
-                '${pageContext.request.contextPath}'
-                + '/patient/appointments/request';
-
-            return;
+            window.location = '${pageContext.request.contextPath}/patient/appointments/request?serviceId=' + encodeURIComponent(serviceId);
         }
-
-        window.location =
-            '${pageContext.request.contextPath}'
-            + '/patient/appointments/request?serviceId='
-            + encodeURIComponent(serviceId);
-    }
-
-</script>
+    </script>
 
 </body>
-
 </html>

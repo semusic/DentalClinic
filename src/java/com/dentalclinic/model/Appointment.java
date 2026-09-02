@@ -7,6 +7,7 @@ import java.time.LocalTime;
 public class Appointment {
 
     private int appointmentId;
+    private String appointmentNumber;
 
     private int patientId;
     private int serviceId;
@@ -42,6 +43,14 @@ public class Appointment {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
+    }
+
+    public String getAppointmentNumber() {
+        return appointmentNumber;
+    }
+
+    public void setAppointmentNumber(String appointmentNumber) {
+        this.appointmentNumber = appointmentNumber;
     }
 
     public int getPatientId() {

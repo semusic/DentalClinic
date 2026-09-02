@@ -1,114 +1,58 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        DentalCare | Request Submitted
-    </title>
-
-    <style>
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            background: #f5f9fc;
-        }
-
-        .card {
-            width: 500px;
-            max-width: 90%;
-            background: white;
-            padding: 45px;
-            text-align: center;
-            border-radius: 18px;
-            box-shadow:
-                0 15px 40px rgba(0, 0, 0, 0.08);
-        }
-
-        .icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: #1677a5;
-        }
-
-        p {
-            color: #718096;
-            line-height: 1.7;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 9px 18px;
-            border-radius: 20px;
-            background: #fff7e6;
-            color: #9a6700;
-            font-weight: 700;
-            margin: 15px 0;
-        }
-
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 20px;
-            background: #1677a5;
-            color: white;
-            border-radius: 9px;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare | Request Submitted</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/public/css/dental.css">
 </head>
-
 <body>
 
-<div class="card">
+    <header class="app-navbar">
+        <div class="nav-container">
+            <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-brand">
+                <div class="brand-icon">🦷</div>
+                <div class="brand-title">Dental<span>Care</span></div>
+                <span class="role-badge patient">Patient</span>
+            </a>
+            <div class="nav-actions">
+                <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
+            </div>
+        </div>
+    </header>
 
-    <div class="icon">
-        ✓
-    </div>
+    <main class="main-container" style="display: flex; align-items: center; justify-content: center;">
+        <div class="card" style="max-width: 540px; text-align: center; padding: 44px 32px;">
+            <div style="width: 72px; height: 72px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px; font-weight: 800;">
+                ✓
+            </div>
 
-    <h1>
-        Appointment Request Submitted
-    </h1>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--text-heading); margin-bottom: 12px;">Appointment Request Submitted!</h1>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">
+                Your appointment request has been recorded. Our clinic team and assigned doctor will review the details.
+            </p>
 
-    <p>
-        Your appointment request has been
-        successfully submitted to DentalCare.
-    </p>
+            <div style="margin: 20px 0;">
+                <span class="badge badge-warning" style="font-size: 13px; padding: 6px 16px;">
+                    STATUS: PENDING DOCTOR APPROVAL
+                </span>
+            </div>
 
-    <div class="status">
-        PENDING DOCTOR REVIEW
-    </div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 28px;">
+                You will receive a notification in your portal inbox as soon as the appointment is confirmed or updated.
+            </p>
 
-    <p>
-        The clinic assistant will review your
-        request before it is sent for doctor approval.
-        You will be notified once a decision is made.
-    </p>
+            <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+                Return to Patient Dashboard
+            </a>
+        </div>
+    </main>
 
-    <a href="${pageContext.request.contextPath}/patient/dashboard">
-        Back to Dashboard
-    </a>
-
-</div>
+    <footer class="app-footer">
+        DentalCare Clinic Management System
+    </footer>
 
 </body>
-
 </html>
