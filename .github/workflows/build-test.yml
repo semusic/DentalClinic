@@ -1,5 +1,4 @@
-src/java/com/dentalclinic/pattern/observer/NotificationObserver.java \
-src/java/com/dentalclinic/pattern/observer/NotificationSubject.java \name: DentalClinic CI
+name: DentalClinic CI
 
 on:
   push:
