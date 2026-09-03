@@ -332,20 +332,32 @@ public DoctorApprovalToken createApproval(
                     "CONFIRMED"
             );
 
-            
             publishConfirmationNotification(
                     approval
             );
 
-        } else {
+        } else if ("RESCHEDULE_REQUIRED".equals(targetStatus)) {
 
-            /*
-             * REJECTED and RESCHEDULE_REQUIRED
-             * are final outcomes for this approval cycle.
-             */
             updateExternalAppointmentStatus(
                     approval.getAppointmentId(),
-                    targetStatus
+                    "RESCHEDULE_REQUIRED"
+            );
+
+            publishRescheduleNotification(
+                    approval,
+                    cleanNote
+            );
+
+        } else if ("REJECTED".equals(targetStatus)) {
+
+            updateExternalAppointmentStatus(
+                    approval.getAppointmentId(),
+                    "REJECTED"
+            );
+
+            publishRejectionNotification(
+                    approval,
+                    cleanNote
             );
         }
 
@@ -417,71 +429,98 @@ public DoctorApprovalToken createApproval(
         }
     }
     
-        private void publishConfirmationNotification(
+    private void publishConfirmationNotification(
             DoctorApprovalReviewDTO approval
     ) {
+        String doctorName = approval.getDoctorName() == null ? "your selected doctor" : approval.getDoctorName();
+        String serviceName = approval.getServiceName() == null ? "dental service" : approval.getServiceName();
+        String date = approval.getRequestedDate() == null ? "" : approval.getRequestedDate().toString();
+        String time = approval.getRequestedTime() == null ? "" : approval.getRequestedTime().toString();
 
-        Notification notification =
-                new Notification();
+        // Patient notification
+        Notification patNav = new Notification();
+        patNav.setRecipientUserId(approval.getPatientUserId());
+        patNav.setAppointmentId(approval.getAppointmentId());
+        patNav.setNotificationType("APPOINTMENT_CONFIRMED");
+        patNav.setChannel("IN_APP");
+        patNav.setSubject("Appointment Confirmed");
+        patNav.setMessage("Your appointment has been confirmed by the doctor.");
+        patNav.setNotificationStatus("PENDING");
+        notificationSubject.notifyObservers(patNav);
 
-        notification.setRecipientUserId(
-                approval.getPatientUserId()
-        );
+        // Assistant notification
+        if (approval.getRecordedByUserId() != null && approval.getRecordedByUserId() > 0) {
+            Notification astNav = new Notification();
+            astNav.setRecipientUserId(approval.getRecordedByUserId());
+            astNav.setAppointmentId(approval.getAppointmentId());
+            astNav.setNotificationType("DOCTOR_APPROVED");
+            astNav.setChannel("IN_APP");
+            astNav.setSubject("Doctor Approved Appointment #" + approval.getAppointmentId());
+            astNav.setMessage("Doctor approved the appointment for " + date + " at " + time + ".");
+            astNav.setNotificationStatus("PENDING");
+            notificationSubject.notifyObservers(astNav);
+        }
+    }
 
-        notification.setAppointmentId(
-                approval.getAppointmentId()
-        );
+    private void publishRescheduleNotification(
+            DoctorApprovalReviewDTO approval,
+            String decisionNote
+    ) {
+        String noteText = (decisionNote != null && !decisionNote.isBlank()) ? " Doctor's Note: " + decisionNote + "." : "";
 
-        notification.setNotificationType(
-                "APPOINTMENT_CONFIRMED"
-        );
+        // Patient notification
+        Notification patNav = new Notification();
+        patNav.setRecipientUserId(approval.getPatientUserId());
+        patNav.setAppointmentId(approval.getAppointmentId());
+        patNav.setNotificationType("RESCHEDULE_REQUIRED");
+        patNav.setChannel("IN_APP");
+        patNav.setSubject("Reschedule Requested by Doctor");
+        patNav.setMessage("Your doctor requested a different appointment time." + noteText);
+        patNav.setNotificationStatus("PENDING");
+        notificationSubject.notifyObservers(patNav);
 
-        notification.setChannel(
-                "IN_APP"
-        );
+        // Assistant notification
+        if (approval.getRecordedByUserId() != null && approval.getRecordedByUserId() > 0) {
+            Notification astNav = new Notification();
+            astNav.setRecipientUserId(approval.getRecordedByUserId());
+            astNav.setAppointmentId(approval.getAppointmentId());
+            astNav.setNotificationType("RESCHEDULE_REQUIRED");
+            astNav.setChannel("IN_APP");
+            astNav.setSubject("Doctor Requested Reschedule #" + approval.getAppointmentId());
+            astNav.setMessage("Doctor requested another appointment time.");
+            astNav.setNotificationStatus("PENDING");
+            notificationSubject.notifyObservers(astNav);
+        }
+    }
 
-        notification.setSubject(
-                "Appointment Confirmed"
-        );
+    private void publishRejectionNotification(
+            DoctorApprovalReviewDTO approval,
+            String decisionNote
+    ) {
+        String noteText = (decisionNote != null && !decisionNote.isBlank()) ? " Reason: " + decisionNote : "";
 
-        String doctorName =
-                approval.getDoctorName() == null
-                        ? "your selected doctor"
-                        : approval.getDoctorName();
+        // Patient notification
+        Notification patNav = new Notification();
+        patNav.setRecipientUserId(approval.getPatientUserId());
+        patNav.setAppointmentId(approval.getAppointmentId());
+        patNav.setNotificationType("APPOINTMENT_REJECTED");
+        patNav.setChannel("IN_APP");
+        patNav.setSubject("Appointment Request Declined");
+        patNav.setMessage("Your appointment was rejected by the doctor." + noteText);
+        patNav.setNotificationStatus("PENDING");
+        notificationSubject.notifyObservers(patNav);
 
-        String serviceName =
-                approval.getServiceName() == null
-                        ? "dental service"
-                        : approval.getServiceName();
-
-        String date =
-                approval.getRequestedDate() == null
-                        ? ""
-                        : approval.getRequestedDate().toString();
-
-        String time =
-                approval.getRequestedTime() == null
-                        ? ""
-                        : approval.getRequestedTime().toString();
-
-        notification.setMessage(
-                "Your appointment for "
-                + serviceName
-                + " with "
-                + doctorName
-                + " has been confirmed for "
-                + date
-                + " at "
-                + time
-                + "."
-        );
-
-        notification.setNotificationStatus(
-                "PENDING"
-        );
-
-        notificationSubject.notifyObservers(
-                notification
-        );
+        // Assistant notification
+        if (approval.getRecordedByUserId() != null && approval.getRecordedByUserId() > 0) {
+            Notification astNav = new Notification();
+            astNav.setRecipientUserId(approval.getRecordedByUserId());
+            astNav.setAppointmentId(approval.getAppointmentId());
+            astNav.setNotificationType("APPOINTMENT_REJECTED");
+            astNav.setChannel("IN_APP");
+            astNav.setSubject("Doctor Rejected Appointment #" + approval.getAppointmentId());
+            astNav.setMessage("Doctor rejected the appointment.");
+            astNav.setNotificationStatus("PENDING");
+            notificationSubject.notifyObservers(astNav);
+        }
     }
 }

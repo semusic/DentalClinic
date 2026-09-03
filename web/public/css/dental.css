@@ -62,12 +62,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 24px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
 }
 
 .nav-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
 }
 
@@ -494,3 +501,183 @@ body {
 }
 
 .no-print { /* for screen — does nothing, used only in @media print */ }
+
+/* SLOT PICKER UI */
+.slot-picker-box {
+    margin-top: 12px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.slot-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.slot-picker-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-heading);
+}
+
+.slot-legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.slot-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slot-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.slot-dot.available-dot {
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px #d1fae5;
+}
+
+.slot-dot.unavailable-dot {
+    background-color: #94a3b8;
+    box-shadow: 0 0 0 2px #f1f5f9;
+}
+
+/* TIME SLOT GRID & RADIO CONTROLS */
+.time-slot-grid, .slot-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    margin-top: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 600px) {
+    .time-slot-grid, .slot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .time-slot-grid, .slot-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Visually hide radio inputs */
+.time-slot-radio {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Compact Tile Label */
+.time-slot-label {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 52px !important;
+    padding: 6px 12px !important;
+    border-radius: 10px !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border: 1.5px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Available hover state */
+.time-slot-label.available:hover {
+    border-color: #0284c7 !important;
+    background-color: #f0f9ff !important;
+    color: #0369a1 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* Selected state via pure CSS :checked selector */
+.time-slot-radio:checked + .time-slot-label {
+    border-color: #0284c7 !important;
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+    transform: scale(1.02) !important;
+}
+
+.time-slot-radio:checked + .time-slot-label .slot-time {
+    color: #ffffff !important;
+}
+
+.time-slot-radio:checked + .time-slot-label .slot-reason {
+    color: #e0f2fe !important;
+}
+
+/* Unavailable state */
+.time-slot-label.unavailable {
+    border-color: #e2e8f0 !important;
+    background-color: #f8fafc !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    opacity: 0.75 !important;
+    pointer-events: none !important;
+}
+
+.time-slot-label.unavailable:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+.slot-time {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+.slot-reason {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+    margin-top: 2px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+}
+
+

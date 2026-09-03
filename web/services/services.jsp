@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.dentalclinic.model.User" %>
 <%@ page import="com.dentalclinic.pattern.composite.DentalServiceComponent" %>
 <%@ page import="com.dentalclinic.pattern.composite.DentalServiceLeaf" %>
 
@@ -12,29 +13,40 @@
 </head>
 <body>
 
-    <header class="app-navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/services" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-            </a>
-            <div class="nav-actions">
-                <%
-                    boolean isLoggedIn = session.getAttribute("authenticatedUser") != null;
-                    if (isLoggedIn) {
-                %>
-                    <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary btn-sm">Go to Dashboard</a>
-                <%
-                    } else {
-                %>
-                    <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary btn-sm">Sign In</a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn btn-primary btn-sm">Register</a>
-                <%
-                    }
-                %>
+<%
+    User userObj = (com.dentalclinic.model.User) session.getAttribute("authenticatedUser");
+    String userRole = (userObj != null && userObj.getRoleName() != null) ? userObj.getRoleName() : "";
+    if ("PATIENT".equalsIgnoreCase(userRole)) {
+        request.setAttribute("activeNav", "services");
+%>
+        <jsp:include page="/WEB-INF/includes/patient-header.jsp" />
+<%
+    } else if ("ADMIN".equalsIgnoreCase(userRole)) {
+        request.setAttribute("activeNav", "services");
+%>
+        <jsp:include page="/WEB-INF/includes/admin-header.jsp" />
+<%
+    } else {
+%>
+        <header class="app-navbar">
+            <div class="nav-container">
+                <a href="${pageContext.request.contextPath}/services" class="nav-brand">
+                    <div class="brand-icon">🦷</div>
+                    <div class="brand-title">Dental<span>Care</span></div>
+                </a>
+                <div class="nav-actions">
+                    <% if (userObj != null) { %>
+                        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary btn-sm">Go to Dashboard</a>
+                    <% } else { %>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-secondary btn-sm">Sign In</a>
+                        <a href="${pageContext.request.contextPath}/register" class="btn btn-primary btn-sm">Register</a>
+                    <% } %>
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
+<%
+    }
+%>
 
     <main class="main-container">
         <div class="page-header" style="text-align: center; margin-bottom: 40px;">

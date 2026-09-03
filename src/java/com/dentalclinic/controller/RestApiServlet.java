@@ -95,11 +95,50 @@ public class RestApiServlet extends HttpServlet {
                 case "invoices":
                     handleInvoices(response, out, idParam);
                     break;
+                case "available-slots":
+                case "slots":
+                    handleAvailableSlots(request, response, out);
+                    break;
                 default:
                     sendError(response, out, HttpServletResponse.SC_NOT_FOUND, "Unknown API resource: " + resource);
             }
         } catch (Exception e) {
             sendError(response, out, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error: " + e.getMessage());
+        }
+    }
+
+    private void handleAvailableSlots(HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws SQLException {
+        String doctorIdParam = request.getParameter("doctorId");
+        String serviceIdParam = request.getParameter("serviceId");
+        String dateParam = request.getParameter("date");
+        String excludeIdParam = request.getParameter("excludeId");
+
+        if (doctorIdParam == null || serviceIdParam == null || dateParam == null) {
+            sendError(response, out, HttpServletResponse.SC_BAD_REQUEST, "doctorId, serviceId, and date parameters are required.");
+            return;
+        }
+
+        try {
+            int doctorId = Integer.parseInt(doctorIdParam);
+            int serviceId = Integer.parseInt(serviceIdParam);
+            java.time.LocalDate date = java.time.LocalDate.parse(dateParam);
+            Integer excludeId = (excludeIdParam != null && !excludeIdParam.isBlank()) ? Integer.parseInt(excludeIdParam) : null;
+
+            com.dentalclinic.service.DoctorAvailabilityService availabilityService = new com.dentalclinic.service.impl.DoctorAvailabilityServiceImpl();
+            List<com.dentalclinic.dto.TimeSlotDTO> slots = availabilityService.getAvailableSlots(doctorId, serviceId, date, excludeId);
+
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < slots.size(); i++) {
+                com.dentalclinic.dto.TimeSlotDTO slot = slots.get(i);
+                sb.append(String.format("{\"time\":\"%s\",\"formattedTime\":\"%s\",\"available\":%b,\"reason\":\"%s\"}",
+                        escapeJson(slot.getTime()), escapeJson(slot.getFormattedTime()), slot.isAvailable(), escapeJson(slot.getReason())));
+                if (i < slots.size() - 1) sb.append(",");
+            }
+            sb.append("]");
+
+            sendJson(response, out, HttpServletResponse.SC_OK, sb.toString());
+        } catch (Exception e) {
+            sendError(response, out, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters for slot search: " + e.getMessage());
         }
     }
 

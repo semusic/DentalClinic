@@ -121,4 +121,57 @@ public class AppointmentServiceImpl
 
         return appointmentDAO.findPendingRequests();
     }
+
+    @Override
+    public void rescheduleAppointment(
+            int appointmentId,
+            java.time.LocalDate newDate,
+            java.time.LocalTime newTime,
+            int requestingUserId
+    ) throws SQLException, ValidationException {
+
+        if (appointmentId <= 0) {
+            throw new ValidationException("Invalid appointment ID.");
+        }
+        if (newDate == null || newTime == null) {
+            throw new ValidationException("New date and time are required for rescheduling.");
+        }
+
+        Appointment existing = appointmentDAO.findById(appointmentId).orElseThrow(() ->
+                new ValidationException("Appointment could not be found.")
+        );
+
+        if (!"RESCHEDULE_REQUIRED".equalsIgnoreCase(existing.getStatusCode())
+                && !"PENDING".equalsIgnoreCase(existing.getStatusCode())
+                && !"AWAITING_DOCTOR_APPROVAL".equalsIgnoreCase(existing.getStatusCode())) {
+            throw new ValidationException("Only appointments requiring reschedule or pending review can be rescheduled.");
+        }
+
+        AppointmentRequestDTO requestDTO = new AppointmentRequestDTO();
+        requestDTO.setPatientId(existing.getPatientId());
+        requestDTO.setDoctorId(existing.getDoctorId());
+        requestDTO.setServiceId(existing.getServiceId());
+        requestDTO.setRequestedDate(newDate);
+        requestDTO.setRequestedTime(newTime);
+        requestDTO.setRequestingUserId(requestingUserId);
+        requestDTO.setPatientReason(existing.getPatientReason());
+
+        // Validate new slot
+        validationChain.getFirstHandler().validate(requestDTO);
+
+        int pendingStatusId = statusDAO.findStatusIdByCode("PENDING")
+                .orElseThrow(() -> new SQLException("PENDING status not configured."));
+
+        boolean updated = appointmentDAO.rescheduleAppointment(
+                appointmentId,
+                newDate,
+                newTime,
+                pendingStatusId,
+                requestingUserId
+        );
+
+        if (!updated) {
+            throw new SQLException("Unable to update appointment for rescheduling.");
+        }
+    }
 }

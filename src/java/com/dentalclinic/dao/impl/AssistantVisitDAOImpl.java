@@ -81,10 +81,16 @@ public class AssistantVisitDAOImpl
             LEFT JOIN patient_visits pv
                 ON a.appointment_id = pv.appointment_id
 
-            WHERE st.status_code = 'CONFIRMED'
-              AND a.requested_date = ?
+            WHERE st.status_code IN (
+                'CONFIRMED',
+                'DOCTOR_APPROVED',
+                'CHECKED_IN',
+                'IN_PROGRESS',
+                'COMPLETED'
+            )
+              AND (? IS NULL OR a.requested_date = ?)
 
-            ORDER BY a.requested_time ASC
+            ORDER BY a.requested_date ASC, a.requested_time ASC
             """;
 
     private static final String FIND_BY_APPOINTMENT =
@@ -167,10 +173,13 @@ public class AssistantVisitDAOImpl
                      connection.prepareStatement(
                              FIND_CONFIRMED)) {
 
-            statement.setDate(
-                    1,
-                    java.sql.Date.valueOf(date)
-            );
+            if (date != null) {
+                statement.setDate(1, java.sql.Date.valueOf(date));
+                statement.setDate(2, java.sql.Date.valueOf(date));
+            } else {
+                statement.setNull(1, java.sql.Types.DATE);
+                statement.setNull(2, java.sql.Types.DATE);
+            }
 
             try (ResultSet resultSet =
                          statement.executeQuery()) {

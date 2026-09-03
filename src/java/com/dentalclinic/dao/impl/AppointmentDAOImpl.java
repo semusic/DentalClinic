@@ -205,6 +205,20 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         last_modified_by_user_id = NULL
     WHERE appointment_id = ?
     """;
+
+    private static final String RESCHEDULE_APPOINTMENT = """
+    UPDATE appointments
+    SET
+        requested_date = ?,
+        requested_time = ?,
+        scheduled_start = NULL,
+        scheduled_end = NULL,
+        status_id = ?,
+        last_modified_by_user_id = ?,
+        reviewed_by_user_id = NULL,
+        reviewed_at = NULL
+    WHERE appointment_id = ?
+    """;
     
     private static final String FIND_BY_VISIT_ID = """
     SELECT
@@ -789,6 +803,31 @@ public boolean updateStatusAsExternalActor(
                 2,
                 appointmentId
         );
+
+        return statement.executeUpdate() > 0;
+    }
+}
+
+@Override
+public boolean rescheduleAppointment(
+        int appointmentId,
+        java.time.LocalDate newDate,
+        java.time.LocalTime newTime,
+        int statusId,
+        int modifiedByUserId
+) throws SQLException {
+
+    try (Connection connection =
+                 DatabaseConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(
+                         RESCHEDULE_APPOINTMENT)) {
+
+        statement.setDate(1, java.sql.Date.valueOf(newDate));
+        statement.setTime(2, java.sql.Time.valueOf(newTime));
+        statement.setInt(3, statusId);
+        statement.setInt(4, modifiedByUserId);
+        statement.setInt(5, appointmentId);
 
         return statement.executeUpdate() > 0;
     }

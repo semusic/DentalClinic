@@ -143,6 +143,11 @@ public class CashierInvoiceServlet
                     visits
             );
 
+            request.setAttribute(
+                    "completedVisits",
+                    visits
+            );
+
             request.getRequestDispatcher(
                     "/cashier/invoices.jsp"
             ).forward(

@@ -6,6 +6,10 @@
     List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 %>
 
+<%
+    request.setAttribute("activeNav", "dashboard");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,27 +20,7 @@
 </head>
 <body>
 
-    <header class="app-navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-                <span class="role-badge patient">Patient</span>
-            </a>
-
-            <div class="nav-menu">
-                <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-link">Dashboard</a>
-                <a href="${pageContext.request.contextPath}/patient/appointments/request" class="nav-link">Book Appointment</a>
-                <a href="${pageContext.request.contextPath}/patient/notifications" class="nav-link active">Notifications</a>
-                <a href="${pageContext.request.contextPath}/services" class="nav-link">Services</a>
-            </div>
-
-            <div class="nav-actions">
-                <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
-            </div>
-        </div>
-    </header>
+    <jsp:include page="/WEB-INF/includes/patient-header.jsp" />
 
     <main class="main-container">
         <div class="page-header">
@@ -75,12 +59,17 @@
                     <%= notification.getMessage() %>
                 </div>
 
-                <div style="display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 10px;">
+                <div style="display: flex; gap: 16px; align-items: center; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 10px; flex-wrap: wrap;">
                     <% if (notification.getAppointmentId() != null) { %>
                         <span><strong>Appointment ID:</strong> #<%= notification.getAppointmentId() %></span>
                     <% } %>
                     <span><strong>Date:</strong> <%= notification.getCreatedAt() %></span>
                     <span><strong>Status:</strong> <%= notification.getNotificationStatus() %></span>
+                    <% if ("RESCHEDULE_REQUIRED".equalsIgnoreCase(notification.getNotificationType()) && notification.getAppointmentId() != null) { %>
+                        <a href="${pageContext.request.contextPath}/patient/appointments/request?rescheduleId=<%= notification.getAppointmentId() %>" class="btn btn-primary btn-sm" style="margin-left: auto;">
+                            Choose New Time →
+                        </a>
+                    <% } %>
                 </div>
             </div>
         <%

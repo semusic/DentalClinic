@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/cashier/payments")
+@WebServlet({"/cashier/payments", "/cashier/receipt"})
 public class CashierPaymentServlet
         extends HttpServlet {
 
@@ -172,6 +172,33 @@ public class CashierPaymentServlet
                     paymentService.getPayments(
                             invoiceId
                     );
+
+            if ("PAID".equalsIgnoreCase(invoice.getInvoiceStatus()) && payments != null && !payments.isEmpty()) {
+                Payment latestPayment = payments.get(payments.size() - 1);
+                Receipt receipt = paymentService.getReceiptByPaymentId(latestPayment.getPaymentId());
+
+                if (invoice.getQrToken() == null || invoice.getQrToken().isBlank()) {
+                    try {
+                        String rawToken = invoiceService.generateQrToken(invoiceId);
+                        invoice.setQrToken(rawToken);
+                    } catch (Exception ignored) {
+                    }
+                }
+
+                request.setAttribute("payment", latestPayment);
+                request.setAttribute("receipt", receipt);
+                request.setAttribute("invoice", invoice);
+                request.setAttribute("invoiceItems", invoiceItems);
+
+                request.getRequestDispatcher(
+                        "/cashier/receipt.jsp"
+                ).forward(
+                        request,
+                        response
+                );
+
+                return;
+            }
 
             BigDecimal alreadyPaid =
                     calculatePaidAmount(

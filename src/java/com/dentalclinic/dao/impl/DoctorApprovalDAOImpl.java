@@ -67,6 +67,7 @@ public class DoctorApprovalDAOImpl
             da.approval_token_hash,
             da.token_expires_at,
             da.token_used_at,
+            da.recorded_by_user_id,
 
             st.status_code AS current_status
 
@@ -430,6 +431,13 @@ public class DoctorApprovalDAOImpl
                         "current_status"
                 )
         );
+
+        int recordedBy = resultSet.getInt("recorded_by_user_id");
+        if (resultSet.wasNull()) {
+            dto.setRecordedByUserId(null);
+        } else {
+            dto.setRecordedByUserId(recordedBy);
+        }
 
         return dto;
     }

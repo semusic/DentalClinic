@@ -13,6 +13,10 @@
     boolean isPaid = invoice != null && "PAID".equalsIgnoreCase(invoice.getInvoiceStatus());
 %>
 
+<%
+    request.setAttribute("activeNav", "history");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,26 +27,7 @@
 </head>
 <body>
 
-    <header class="app-navbar no-print">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-                <span class="role-badge cashier">Cashier</span>
-            </a>
-
-            <div class="nav-menu">
-                <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-link">Dashboard</a>
-                <a href="${pageContext.request.contextPath}/cashier/invoices" class="nav-link">Invoices</a>
-                <a href="${pageContext.request.contextPath}/cashier/invoice-history" class="nav-link active">Invoice History</a>
-            </div>
-
-            <div class="nav-actions">
-                <a href="${pageContext.request.contextPath}/cashier/invoice-history" class="btn btn-secondary btn-sm">← Back to History</a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
-            </div>
-        </div>
-    </header>
+    <jsp:include page="/WEB-INF/includes/cashier-header.jsp" />
 
     <main class="main-container">
         <div class="card" style="max-width: 850px; margin: 0 auto; padding: 36px;">
@@ -164,7 +149,11 @@
                 <div class="no-print" style="display: flex; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 24px; flex-wrap: wrap;">
                     <a href="${pageContext.request.contextPath}/cashier/invoice-history" class="btn btn-secondary">← Back to History</a>
                     <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Invoice</button>
-                    <% if (isUnpaid) { %>
+                    <% if (isPaid) { %>
+                        <a href="${pageContext.request.contextPath}/cashier/payments?invoiceId=<%= invoice.getInvoiceId() %>" class="btn btn-primary" style="margin-left: auto;">
+                            View Receipt →
+                        </a>
+                    <% } else if (isUnpaid) { %>
                         <a href="${pageContext.request.contextPath}/cashier/payments?invoiceId=<%= invoice.getInvoiceId() %>" class="btn btn-primary" style="margin-left: auto;">
                             Proceed to Payment →
                         </a>

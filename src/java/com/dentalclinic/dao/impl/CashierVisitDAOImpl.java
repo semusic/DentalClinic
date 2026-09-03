@@ -58,10 +58,10 @@ public class CashierVisitDAOImpl
         LEFT JOIN invoices i
             ON pv.visit_id = i.visit_id
 
-        WHERE pv.consultation_completed_at IS NOT NULL
+        WHERE (pv.consultation_completed_at IS NOT NULL OR a.status_id IN (SELECT status_id FROM appointment_statuses WHERE status_code IN ('COMPLETED', 'IN_PROGRESS', 'CHECKED_IN')))
           AND i.invoice_id IS NULL
 
-        ORDER BY pv.consultation_completed_at DESC
+        ORDER BY pv.visit_id DESC
         """;
 
     private static final String FIND_BY_VISIT_ID = """

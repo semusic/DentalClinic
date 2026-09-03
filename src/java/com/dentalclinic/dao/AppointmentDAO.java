@@ -58,4 +58,12 @@ public interface AppointmentDAO {
             int appointmentId,
             int statusId
     ) throws SQLException;
+
+    boolean rescheduleAppointment(
+            int appointmentId,
+            LocalDate newDate,
+            LocalTime newTime,
+            int statusId,
+            int modifiedByUserId
+    ) throws SQLException;
 }

@@ -196,15 +196,45 @@ public class AssistantAppointmentServlet extends HttpServlet {
                             assistantUserId
                     );
 
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/assistant/appointments"
-                    + "?doctorToken="
-                    + java.net.URLEncoder.encode(
-                            approvalToken,
-                            java.nio.charset.StandardCharsets.UTF_8
-                    )
-            );
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/assistant/appointments"
+                        + "?action=review&id="
+                        + appointmentId
+                        + "&doctorToken="
+                        + java.net.URLEncoder.encode(
+                                approvalToken,
+                                java.nio.charset.StandardCharsets.UTF_8
+                        )
+                );
+
+                return;
+            }
+
+            /*
+             * Assistant regenerates a fresh approval link
+             * for an appointment already in AWAITING_DOCTOR_APPROVAL.
+             * Does NOT change the appointment status.
+             */
+            if ("resendToDoctor".equalsIgnoreCase(action)) {
+
+                String approvalToken =
+                    appointmentReviewService.resendApprovalLink(
+                            appointmentId,
+                            assistantUserId
+                    );
+
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/assistant/appointments"
+                        + "?action=review&id="
+                        + appointmentId
+                        + "&doctorToken="
+                        + java.net.URLEncoder.encode(
+                                approvalToken,
+                                java.nio.charset.StandardCharsets.UTF_8
+                        )
+                );
 
                 return;
             }
@@ -223,29 +253,40 @@ public class AssistantAppointmentServlet extends HttpServlet {
 
         } catch (ValidationException e) {
 
-        request.setAttribute(
-                "error",
-                e.getMessage()
-        );
+            try {
+                int appointmentId = parseId(idParameter);
+                Optional<AppointmentReviewDTO> review = appointmentReviewService.getReviewById(appointmentId);
+                if (review.isPresent()) {
+                    request.setAttribute("appointmentReview", review.get());
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("/assistant/appointment-review.jsp").forward(request, response);
+                    return;
+                }
+            } catch (Exception ignored) {}
 
-        try {
-            loadQueue(request, response);
-        } catch (SQLException sqlException) {
-
-            throw new ServletException(
-                    "Unable to reload appointment queue.",
-                    sqlException
+            request.setAttribute(
+                    "error",
+                    e.getMessage()
             );
-        }
+
+            try {
+                loadQueue(request, response);
+            } catch (SQLException sqlException) {
+
+                throw new ServletException(
+                        "Unable to reload appointment queue.",
+                        sqlException
+                );
+            }
 
         } catch (SQLException e) {
 
-                    throw new ServletException(
-                            "Unable to update appointment.",
-                            e
-                    );
-                }
-            }
+            throw new ServletException(
+                    "Unable to update appointment.",
+                    e
+            );
+        }
+    }
 
     private void loadQueue(
             HttpServletRequest request,

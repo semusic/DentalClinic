@@ -181,9 +181,18 @@ public class DoctorApprovalReviewDTO {
         this.currentStatus = currentStatus;
     }
     
+    private Integer recordedByUserId;
+
+    public Integer getRecordedByUserId() {
+        return recordedByUserId;
+    }
+
+    public void setRecordedByUserId(Integer recordedByUserId) {
+        this.recordedByUserId = recordedByUserId;
+    }
+
     public int getPatientUserId() {
-    return patientUserId;
-    
+        return patientUserId;
     }
 
     public void setPatientUserId(int patientUserId) {

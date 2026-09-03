@@ -25,4 +25,14 @@ public interface AppointmentReviewService {
         int appointmentId,
         int assistantUserId
     ) throws SQLException, ValidationException;
+
+    /**
+     * Regenerates a fresh doctor approval token for an appointment
+     * that is already in AWAITING_DOCTOR_APPROVAL state.
+     * Does NOT change the appointment status.
+     */
+    String resendApprovalLink(
+        int appointmentId,
+        int assistantUserId
+    ) throws SQLException, ValidationException;
 }

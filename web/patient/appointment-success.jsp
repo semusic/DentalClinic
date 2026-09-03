@@ -1,4 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%
+    request.setAttribute("activeNav", "book");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,19 +13,7 @@
 </head>
 <body>
 
-    <header class="app-navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/patient/dashboard" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-                <span class="role-badge patient">Patient</span>
-            </a>
-            <div class="nav-actions">
-                <a href="${pageContext.request.contextPath}/patient/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
-            </div>
-        </div>
-    </header>
+    <jsp:include page="/WEB-INF/includes/patient-header.jsp" />
 
     <main class="main-container" style="display: flex; align-items: center; justify-content: center;">
         <div class="card" style="max-width: 540px; text-align: center; padding: 44px 32px;">

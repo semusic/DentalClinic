@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="com.dentalclinic.model.User" %>
 <%
+    request.setAttribute("activeNav", "dashboard");
     User user = (User) session.getAttribute("authenticatedUser");
     String userName = (user != null && user.getUsername() != null) ? user.getUsername() : "Cashier";
 %>
@@ -14,25 +15,7 @@
 </head>
 <body>
 
-    <header class="app-navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-                <span class="role-badge cashier">Cashier</span>
-            </a>
-
-            <div class="nav-menu">
-                <a href="${pageContext.request.contextPath}/cashier/dashboard" class="nav-link active">Dashboard</a>
-                <a href="${pageContext.request.contextPath}/cashier/invoices" class="nav-link">Invoices</a>
-                <a href="${pageContext.request.contextPath}/cashier/invoice-history" class="nav-link">Invoice History</a>
-            </div>
-
-            <div class="nav-actions">
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
-            </div>
-        </div>
-    </header>
+    <jsp:include page="/WEB-INF/includes/cashier-header.jsp" />
 
     <main class="main-container">
         <div class="page-header">

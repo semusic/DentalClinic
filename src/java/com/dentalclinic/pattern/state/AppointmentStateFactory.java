@@ -25,6 +25,9 @@ public class AppointmentStateFactory {
             case "DOCTOR_APPROVED" ->
                     new DoctorApprovedAppointmentState();
 
+            case "RESCHEDULE_REQUIRED" ->
+                    new RescheduleRequiredAppointmentState();
+
             default ->
                     new UnsupportedAppointmentState(
                             statusCode

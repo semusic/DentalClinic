@@ -149,26 +149,28 @@ public class AssistantVisitServlet
              * 3. Display confirmed appointments
              * --------------------------------------------------
              */
-            LocalDate date;
+            LocalDate date = null;
+            boolean showAll = "all".equalsIgnoreCase(dateParameter);
 
-            if (dateParameter == null
-                    || dateParameter.isBlank()) {
-
-                date = LocalDate.now();
-
-            } else {
-
-                date =
-                        LocalDate.parse(
-                                dateParameter
-                        );
+            if (!showAll) {
+                if (dateParameter == null || dateParameter.isBlank()) {
+                    date = LocalDate.now();
+                } else {
+                    date = LocalDate.parse(dateParameter);
+                }
             }
 
             List<AssistantVisitDTO> appointments =
-                    assistantVisitService
-                            .getConfirmedAppointments(
-                                    date
-                            );
+                    assistantVisitService.getConfirmedAppointments(date);
+
+            if (dateParameter == null && appointments.isEmpty()) {
+                List<AssistantVisitDTO> allAppointments =
+                        assistantVisitService.getConfirmedAppointments(null);
+                if (!allAppointments.isEmpty()) {
+                    appointments = allAppointments;
+                    showAll = true;
+                }
+            }
 
             request.setAttribute(
                     "appointments",
@@ -178,6 +180,11 @@ public class AssistantVisitServlet
             request.setAttribute(
                     "selectedDate",
                     date
+            );
+
+            request.setAttribute(
+                    "showAll",
+                    showAll
             );
 
             request.getRequestDispatcher(

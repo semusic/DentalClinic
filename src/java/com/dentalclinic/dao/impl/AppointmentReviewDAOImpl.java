@@ -80,7 +80,8 @@ public class AppointmentReviewDAOImpl
         WHERE st.status_code IN (
             'PENDING',
             'UNDER_REVIEW',
-            'AWAITING_DOCTOR_APPROVAL'
+            'AWAITING_DOCTOR_APPROVAL',
+            'RESCHEDULE_REQUIRED'
         )
         ORDER BY a.created_at ASC
         """;

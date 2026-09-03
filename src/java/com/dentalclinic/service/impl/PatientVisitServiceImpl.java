@@ -64,11 +64,11 @@ public class PatientVisitServiceImpl
                 );
 
         /*
-         * Only CONFIRMED appointments can become
+         * Only CONFIRMED or DOCTOR_APPROVED appointments can become
          * patient visits.
          */
-        if (!"CONFIRMED".equals(
-                appointment.getStatusCode())) {
+        if (!"CONFIRMED".equals(appointment.getStatusCode())
+                && !"DOCTOR_APPROVED".equals(appointment.getStatusCode())) {
 
             throw new ValidationException(
                     "Only confirmed appointments can be checked in."

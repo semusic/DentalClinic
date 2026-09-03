@@ -24,4 +24,11 @@ public interface AppointmentService {
 
     List<Appointment> getPendingRequests()
             throws SQLException;
+
+    void rescheduleAppointment(
+            int appointmentId,
+            java.time.LocalDate newDate,
+            java.time.LocalTime newTime,
+            int requestingUserId
+    ) throws SQLException, ValidationException;
 }

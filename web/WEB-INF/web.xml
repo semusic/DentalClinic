@@ -10,7 +10,7 @@
 
     <context-param>
         <param-name>PUBLIC_BASE_URL</param-name>
-        <param-value>https://arranged-pod-officials-purpose.trycloudflare.com  </param-value>
+        <param-value>https://jim-peterson-investigator-bulk.trycloudflare.com</param-value>
     </context-param>
 
 </web-app>

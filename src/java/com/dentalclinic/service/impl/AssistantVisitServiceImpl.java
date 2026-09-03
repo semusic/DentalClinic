@@ -44,12 +44,6 @@ public class AssistantVisitServiceImpl
             LocalDate date
     ) throws SQLException {
 
-        if (date == null) {
-            throw new IllegalArgumentException(
-                    "Date is required."
-            );
-        }
-
         return assistantVisitDAO
                 .findConfirmedAppointments(date);
     }

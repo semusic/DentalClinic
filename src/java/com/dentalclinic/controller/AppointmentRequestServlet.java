@@ -1,13 +1,17 @@
 package com.dentalclinic.controller;
 
+import com.dentalclinic.dao.DoctorApprovalDAO;
 import com.dentalclinic.dao.DoctorDAO;
 import com.dentalclinic.dao.PatientDAO;
 import com.dentalclinic.dao.ServiceDAO;
+import com.dentalclinic.dao.impl.DoctorApprovalDAOImpl;
 import com.dentalclinic.dao.impl.DoctorDAOImpl;
 import com.dentalclinic.dao.impl.PatientDAOImpl;
 import com.dentalclinic.dao.impl.ServiceDAOImpl;
 import com.dentalclinic.dto.AppointmentRequestDTO;
+import com.dentalclinic.dto.DoctorApprovalReviewDTO;
 import com.dentalclinic.exception.ValidationException;
+import com.dentalclinic.model.Appointment;
 import com.dentalclinic.model.Doctor;
 import com.dentalclinic.model.Patient;
 import com.dentalclinic.model.Service;
@@ -36,21 +40,15 @@ public class AppointmentRequestServlet extends HttpServlet {
     private ServiceDAO serviceDAO;
     private DoctorDAO doctorDAO;
     private AppointmentFacade appointmentFacade;
+    private DoctorApprovalDAO approvalDAO;
 
     @Override
     public void init() {
-
-        patientDAO =
-                new PatientDAOImpl();
-
-        serviceDAO =
-                new ServiceDAOImpl();
-
-        doctorDAO =
-                new DoctorDAOImpl();
-
-        appointmentFacade =
-                new AppointmentFacade();
+        patientDAO = new PatientDAOImpl();
+        serviceDAO = new ServiceDAOImpl();
+        doctorDAO = new DoctorDAOImpl();
+        appointmentFacade = new AppointmentFacade();
+        approvalDAO = new DoctorApprovalDAOImpl();
     }
 
     @Override
@@ -60,69 +58,47 @@ public class AppointmentRequestServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            List<Service> services = serviceDAO.findAllActive();
+            request.setAttribute("services", services);
 
-            List<Service> services =
-                    serviceDAO.findAllActive();
-
-            request.setAttribute(
-                    "services",
-                    services
-            );
-
-            String serviceIdParameter =
-                    request.getParameter("serviceId");
-
-            if (serviceIdParameter != null
-                    && !serviceIdParameter.isBlank()) {
-
+            String rescheduleIdParam = request.getParameter("rescheduleId");
+            if (rescheduleIdParam != null && !rescheduleIdParam.isBlank()) {
                 try {
+                    int rescheduleId = Integer.parseInt(rescheduleIdParam);
+                    Optional<Appointment> appOpt = appointmentFacade.getAppointment(rescheduleId);
+                    if (appOpt.isPresent()) {
+                        Appointment app = appOpt.get();
+                        request.setAttribute("rescheduleAppointment", app);
+                        request.setAttribute("selectedServiceId", app.getServiceId());
+                        request.setAttribute("doctors", doctorDAO.findByServiceId(app.getServiceId()));
 
-                    int serviceId =
-                            Integer.parseInt(
-                                    serviceIdParameter
-                            );
-
-                    List<Doctor> doctors =
-                            doctorDAO.findByServiceId(
-                                    serviceId
-                            );
-
-                    request.setAttribute(
-                            "selectedServiceId",
-                            serviceId
-                    );
-
-                    request.setAttribute(
-                            "doctors",
-                            doctors
-                    );
-
-                } catch (NumberFormatException e) {
-
-                    request.setAttribute(
-                            "error",
-                            "Invalid service selection."
-                    );
-                }
-
+                        Optional<DoctorApprovalReviewDTO> reviewOpt = approvalDAO.findByAppointmentId(rescheduleId);
+                        if (reviewOpt.isPresent()) {
+                            request.setAttribute("doctorReview", reviewOpt.get());
+                        }
+                    }
+                } catch (Exception ignored) {}
             } else {
+                String serviceIdParameter = request.getParameter("serviceId");
 
-                request.setAttribute(
-                        "doctors",
-                        List.of()
-                );
+                if (serviceIdParameter != null && !serviceIdParameter.isBlank()) {
+                    try {
+                        int serviceId = Integer.parseInt(serviceIdParameter);
+                        List<Doctor> doctors = doctorDAO.findByServiceId(serviceId);
+                        request.setAttribute("selectedServiceId", serviceId);
+                        request.setAttribute("doctors", doctors);
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("error", "Invalid service selection.");
+                    }
+                } else {
+                    request.setAttribute("doctors", List.of());
+                }
             }
 
-            request.getRequestDispatcher(
-                    "/patient/appointment-request.jsp"
-            ).forward(request, response);
+            request.getRequestDispatcher("/patient/appointment-request.jsp").forward(request, response);
 
         } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Unable to load appointment form.",
-                    e
-            );
+            throw new ServletException("Unable to load appointment form.", e);
         }
     }
 
@@ -134,122 +110,68 @@ public class AppointmentRequestServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session =
-                request.getSession(false);
-
+        HttpSession session = request.getSession(false);
         if (session == null) {
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
-            );
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        User authenticatedUser =
-                (User) session.getAttribute(
-                        "authenticatedUser"
-                );
-
+        User authenticatedUser = (User) session.getAttribute("authenticatedUser");
         if (authenticatedUser == null) {
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
-            );
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         try {
-
-            /*
-             * Obtain the actual patient record
-             * belonging to the authenticated user.
-             */
-            Optional<Patient> patient =
-                    patientDAO.findByUserId(
-                            authenticatedUser.getUserId()
-                    );
-
+            Optional<Patient> patient = patientDAO.findByUserId(authenticatedUser.getUserId());
             if (patient.isEmpty()) {
-
-                request.setAttribute(
-                        "error",
-                        "Patient profile could not be found."
-                );
-
+                request.setAttribute("error", "Patient profile could not be found.");
                 doGet(request, response);
                 return;
             }
 
-            String serviceIdParameter =
-                    request.getParameter("serviceId");
+            String rescheduleIdParam = request.getParameter("rescheduleId");
+            String serviceIdParameter = request.getParameter("serviceId");
+            String doctorIdParameter = request.getParameter("doctorId");
+            String requestedDateParameter = request.getParameter("requestedDate");
+            String requestedTimeParameter = request.getParameter("requestedTime");
+            String patientReason = request.getParameter("patientReason");
 
-            String doctorIdParameter =
-                    request.getParameter("doctorId");
+            LocalDate requestedDate = LocalDate.parse(requestedDateParameter);
+            LocalTime requestedTime = LocalTime.parse(requestedTimeParameter);
 
-            String requestedDateParameter =
-                    request.getParameter("requestedDate");
+            if (rescheduleIdParam != null && !rescheduleIdParam.isBlank()) {
+                int rescheduleId = Integer.parseInt(rescheduleIdParam);
 
-            String requestedTimeParameter =
-                    request.getParameter("requestedTime");
+                appointmentFacade.rescheduleAppointment(
+                        rescheduleId,
+                        requestedDate,
+                        requestedTime,
+                        authenticatedUser.getUserId()
+                );
 
-            String patientReason =
-                    request.getParameter("patientReason");
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/patient/appointments/success?id="
+                        + rescheduleId
+                        + "&rescheduled=true"
+                );
+                return;
+            }
 
-            int serviceId =
-                    Integer.parseInt(
-                            serviceIdParameter
-                    );
+            int serviceId = Integer.parseInt(serviceIdParameter);
+            int doctorId = Integer.parseInt(doctorIdParameter);
 
-            int doctorId =
-                    Integer.parseInt(
-                            doctorIdParameter
-                    );
+            AppointmentRequestDTO appointmentRequest = new AppointmentRequestDTO();
+            appointmentRequest.setPatientId(patient.get().getPatientId());
+            appointmentRequest.setRequestingUserId(authenticatedUser.getUserId());
+            appointmentRequest.setServiceId(serviceId);
+            appointmentRequest.setDoctorId(doctorId);
+            appointmentRequest.setRequestedDate(requestedDate);
+            appointmentRequest.setRequestedTime(requestedTime);
+            appointmentRequest.setPatientReason(patientReason);
 
-            LocalDate requestedDate =
-                    LocalDate.parse(
-                            requestedDateParameter
-                    );
-
-            LocalTime requestedTime =
-                    LocalTime.parse(
-                            requestedTimeParameter
-                    );
-
-            AppointmentRequestDTO appointmentRequest =
-                    new AppointmentRequestDTO();
-
-            appointmentRequest.setPatientId(
-                    patient.get().getPatientId()
-            );
-
-            appointmentRequest.setRequestingUserId(
-                    authenticatedUser.getUserId()
-            );
-
-            appointmentRequest.setServiceId(
-                    serviceId
-            );
-
-            appointmentRequest.setDoctorId(
-                    doctorId
-            );
-
-            appointmentRequest.setRequestedDate(
-                    requestedDate
-            );
-
-            appointmentRequest.setRequestedTime(
-                    requestedTime
-            );
-
-            appointmentRequest.setPatientReason(
-                    patientReason
-            );
-
-            int appointmentId =
-                    appointmentFacade.requestAppointment(
-                            appointmentRequest
-                    );
+            int appointmentId = appointmentFacade.requestAppointment(appointmentRequest);
 
             response.sendRedirect(
                     request.getContextPath()
@@ -257,31 +179,14 @@ public class AppointmentRequestServlet extends HttpServlet {
                     + appointmentId
             );
 
-        } catch (NumberFormatException
-                | DateTimeParseException e) {
-
-            request.setAttribute(
-                    "error",
-                    "Please enter valid appointment details."
-            );
-
+        } catch (NumberFormatException | DateTimeParseException e) {
+            request.setAttribute("error", "Please enter valid appointment details.");
             doGet(request, response);
-
         } catch (ValidationException e) {
-
-            request.setAttribute(
-                    "error",
-                    e.getMessage()
-            );
-
+            request.setAttribute("error", e.getMessage());
             doGet(request, response);
-
         } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Unable to submit appointment request.",
-                    e
-            );
+            throw new ServletException("Unable to submit appointment request.", e);
         }
     }
 }

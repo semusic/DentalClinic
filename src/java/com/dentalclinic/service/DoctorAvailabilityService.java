@@ -1,5 +1,6 @@
 package com.dentalclinic.service;
 
+import com.dentalclinic.dto.TimeSlotDTO;
 import com.dentalclinic.model.DoctorSchedule;
 
 import java.sql.SQLException;
@@ -14,4 +15,6 @@ public interface DoctorAvailabilityService {
     boolean isWithinWorkingHours(int doctorId, LocalDate date, LocalTime time) throws SQLException;
 
     boolean isWithinWorkingHours(int doctorId, LocalDate date, LocalTime time, int durationMinutes) throws SQLException;
+
+    List<TimeSlotDTO> getAvailableSlots(int doctorId, int serviceId, LocalDate date, Integer excludeAppointmentId) throws SQLException;
 }

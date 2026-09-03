@@ -53,24 +53,45 @@
 </head>
 <body>
 
-    <header class="app-navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/dashboard" class="nav-brand">
-                <div class="brand-icon">🦷</div>
-                <div class="brand-title">Dental<span>Care</span></div>
-                <span class="role-badge"><%= role %></span>
-            </a>
+<%
+    if ("ADMIN".equalsIgnoreCase(role)) {
+        request.setAttribute("activeNav", "help");
+%>
+        <jsp:include page="/WEB-INF/includes/admin-header.jsp" />
+<%
+    } else if ("ASSISTANT".equalsIgnoreCase(role)) {
+        request.setAttribute("activeNav", "help");
+%>
+        <jsp:include page="/WEB-INF/includes/assistant-header.jsp" />
+<%
+    } else if ("PATIENT".equalsIgnoreCase(role)) {
+        request.setAttribute("activeNav", "help");
+%>
+        <jsp:include page="/WEB-INF/includes/patient-header.jsp" />
+<%
+    } else if ("CASHIER".equalsIgnoreCase(role)) {
+        request.setAttribute("activeNav", "help");
+%>
+        <jsp:include page="/WEB-INF/includes/cashier-header.jsp" />
+<%
+    } else {
+%>
+        <header class="app-navbar">
+            <div class="nav-container">
+                <a href="${pageContext.request.contextPath}/login" class="nav-brand">
+                    <div class="brand-icon">🦷</div>
+                    <div class="brand-title">Dental<span>Care</span></div>
+                    <span class="role-badge">Guest Guide</span>
+                </a>
 
-            <div class="nav-actions">
-                <% if (user != null) { %>
-                    <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout btn-sm">Logout</a>
-                <% } else { %>
+                <div class="nav-actions">
                     <a href="${pageContext.request.contextPath}/login" class="btn btn-primary btn-sm">Sign In</a>
-                <% } %>
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
+<%
+    }
+%>
 
     <main class="main-container">
         <div class="page-header" style="margin-bottom: 32px;">

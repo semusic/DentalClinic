@@ -83,6 +83,26 @@ public class AppointmentReviewServiceImpl
             int assistantUserId
     ) throws SQLException, ValidationException {
 
+        /*
+         * The state machine requires PENDING → UNDER_REVIEW → AWAITING_DOCTOR_APPROVAL.
+         * If the appointment is still PENDING, automatically move it to
+         * UNDER_REVIEW first so the assistant can skip that manual step.
+         */
+        AppointmentReviewDTO currentReview =
+                reviewDAO.findReviewById(appointmentId)
+                        .orElseThrow(() -> new ValidationException(
+                                "Appointment could not be found."
+                        ));
+
+        if ("PENDING".equals(currentReview.getStatusCode())) {
+            transitionAppointment(
+                    appointmentId,
+                    assistantUserId,
+                    "UNDER_REVIEW",
+                    "Assistant automatically moved appointment to review."
+            );
+        }
+
         transitionAppointment(
                 appointmentId,
                 assistantUserId,
@@ -112,7 +132,7 @@ public class AppointmentReviewServiceImpl
                 notification.setSubject("DentalCare Approval Request: " + review.getServiceName() + " (" + review.getRequestedDate() + ")");
 
                 String emailBody = String.format(
-                        "Dear Dr. %s %s,\n\n" +
+                        "Dear %s,\n\n" +
                         "A new patient appointment requires your clinical review and approval.\n\n" +
                         "Patient Name: %s\n" +
                         "Requested Service: %s\n" +
@@ -123,9 +143,8 @@ public class AppointmentReviewServiceImpl
                         "%s\n\n" +
                         "Security Notice: This link is temporary, single-use, and valid for 24 hours.\n\n" +
                         "DentalCare Clinic Management System",
-                        review.getDoctorFirstName() != null ? review.getDoctorFirstName() : "",
-                        review.getDoctorLastName() != null ? review.getDoctorLastName() : "",
-                        review.getPatientFirstName() + " " + review.getPatientLastName(),
+                        review.getDoctorName() != null ? review.getDoctorName() : "Doctor",
+                        review.getPatientName() != null ? review.getPatientName() : "Patient",
                         review.getServiceName(),
                         review.getRequestedDate(),
                         review.getRequestedTime() != null ? review.getRequestedTime().toString() : "Flexible",
@@ -141,6 +160,41 @@ public class AppointmentReviewServiceImpl
         } catch (Exception e) {
             System.err.println("Failed to dispatch doctor email notification: " + e.getMessage());
         }
+
+        return token.getRawToken();
+    }
+
+    @Override
+    public String resendApprovalLink(
+            int appointmentId,
+            int assistantUserId
+    ) throws SQLException, ValidationException {
+
+        /*
+         * Verify the appointment is in AWAITING_DOCTOR_APPROVAL.
+         * We do NOT change the status — just generate a fresh token.
+         */
+        AppointmentReviewDTO review =
+                reviewDAO.findReviewById(appointmentId)
+                        .orElseThrow(() -> new ValidationException(
+                                "Appointment could not be found."
+                        ));
+
+        if (!"AWAITING_DOCTOR_APPROVAL".equals(review.getStatusCode())) {
+            throw new ValidationException(
+                    "Cannot resend approval link: appointment is not awaiting doctor approval."
+            );
+        }
+
+        /*
+         * Generate a brand-new token (additional row in doctor_approvals).
+         * The doctor can use any active, non-expired token for this appointment.
+         */
+        DoctorApprovalToken token =
+                doctorApprovalService.createApproval(
+                        appointmentId,
+                        assistantUserId
+                );
 
         return token.getRawToken();
     }
